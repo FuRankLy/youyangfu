@@ -1,1 +1,319 @@
 @import "tailwindcss";
+
+/* Design tokens. Source of truth: docs/blueprint.md, section 6.
+   In Now mode the inline mode script overrides the colour variables on <html>. */
+:root {
+  --paper: #edefec;
+  --surface: #f7f8f6;
+  --ink: #1b1e24;
+  --ink-soft: #5c636d;
+  --grid: #c3c8c8;
+  --line: #a7adb1;
+  --cinnabar: #c23b22;
+  --jade: #2b7a5f;
+  color-scheme: light;
+
+  --header-h: 4rem;
+  --gutter: 1rem;
+}
+:root[data-theme="dark"] {
+  --paper: #13161b;
+  --surface: #1a1e24;
+  --ink: #e7e9e4;
+  --ink-soft: #979da6;
+  --grid: #2c313a;
+  --line: #454c57;
+  --cinnabar: #e0563d;
+  --jade: #4fb08b;
+  color-scheme: dark;
+}
+@media (min-width: 40rem) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 2.5rem;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-grid: var(--grid);
+  --color-line: var(--line);
+  --color-cinnabar: var(--cinnabar);
+  --color-jade: var(--jade);
+
+  --font-sans: var(--font-instrument), "Helvetica Neue", Arial, sans-serif;
+  --font-han: var(--font-wenkai), "Kaiti SC", "STKaiti", "KaiTi", serif;
+}
+
+@theme {
+  /* Motion tokens */
+  --ease-brush: cubic-bezier(0.55, 0, 0.35, 1);
+  --ease-flight: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Type scale: 76, 52, 36, 26, 20, 17, 14, 12 */
+  --text-display: clamp(2.75rem, 7.2vw, 4.75rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(2.125rem, 4.8vw, 3.25rem);
+  --text-title--line-height: 1.04;
+  --text-title--letter-spacing: -0.025em;
+  --text-heading: clamp(1.625rem, 3vw, 2.25rem);
+  --text-heading--line-height: 1.12;
+  --text-heading--letter-spacing: -0.02em;
+  --text-subhead: 1.625rem;
+  --text-subhead--line-height: 1.2;
+  --text-subhead--letter-spacing: -0.01em;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.45;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+  --text-tiny: 0.75rem;
+  --text-tiny--line-height: 1.4;
+
+  --radius-control: 2px;
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  :focus-visible {
+    outline: 1.5px solid var(--cinnabar);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  button,
+  [role="button"],
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+
+  /* Lenis */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+}
+
+/* Page frame: centred, 1440px max, side margins that grow with the viewport. */
+@utility wrap {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+/* The 12-column grid. Children place themselves with col-span-*. */
+@utility grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 1rem;
+  @media (min-width: 40rem) {
+    column-gap: 1.5rem;
+  }
+}
+
+/* Vertical rhythm between chapters. */
+@utility chapter-space {
+  padding-block: clamp(5rem, 11vw, 10rem);
+}
+
+/* Chinese text set in the Kai face. */
+@utility han {
+  font-family: var(--font-han);
+  font-weight: 400;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Text link: quiet underline that turns cinnabar on hover. */
+@utility link {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: var(--line);
+  transition: text-decoration-color 160ms var(--ease-settle);
+  &:hover {
+    text-decoration-color: var(--cinnabar);
+  }
+}
+
+/* Running text column. */
+@utility measure {
+  max-width: 68ch;
+}
+
+@utility sr-only-focusable {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 0.875rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 2px;
+  transform: translateY(-200%);
+  &:focus-visible {
+    transform: none;
+  }
+}
+
+/* Opening. With JavaScript the canvas draws the name, so the plain heading hides
+   before first paint and the late text waits for the sequence to finish. */
+[data-js] .opening-fallback {
+  opacity: 0;
+}
+[data-js] .opening-late {
+  opacity: 0;
+  transition: opacity 600ms var(--ease-reveal);
+}
+[data-js] .opening[data-phase="idle"] .opening-late {
+  opacity: calc(1 - var(--han, 0));
+}
+
+/* Sections come together as they scroll into view. Each marked piece travels
+   in from an offset and settles while its top rises through the lower part of
+   the screen, scrubbed by scroll, so scrolling back up takes it apart again.
+   Per piece: --ax and --ay set where it comes from, --ar a slight turn, and
+   --i staggers it. [data-assemble-items] staggers its children in order.
+   Without scroll-driven animations, or with reduced motion, the finished
+   layout simply shows. */
+@keyframes assemble {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--ax, 0rem), var(--ay, 2.5rem), 0) rotate(var(--ar, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-assemble],
+    [data-assemble-items] > * {
+      animation: assemble linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 4vh) entry calc(36vh + var(--i, 0) * 4vh);
+    }
+  }
+}
+[data-assemble="left"] {
+  --ax: -3.5rem;
+  --ay: 0rem;
+}
+[data-assemble="right"] {
+  --ax: 3.5rem;
+  --ay: 0rem;
+}
+[data-assemble="drop"] {
+  --ay: -2rem;
+  --ar: -8deg;
+}
+[data-assemble-items] > :nth-child(2) {
+  --i: 0.7;
+}
+[data-assemble-items] > :nth-child(3) {
+  --i: 1.4;
+}
+[data-assemble-items] > :nth-child(4) {
+  --i: 2.1;
+}
+[data-assemble-items] > :nth-child(5) {
+  --i: 2.8;
+}
+[data-assemble-items] > :nth-child(6) {
+  --i: 3.5;
+}
+[data-assemble-items] > :nth-child(7) {
+  --i: 4.2;
+}
+[data-assemble-items] > :nth-child(8) {
+  --i: 4.9;
+}
+[data-assemble-items] > :nth-child(9) {
+  --i: 5.6;
+}
+[data-assemble-items] > :nth-child(10) {
+  --i: 6.3;
+}
+[data-assemble-items] > :nth-child(11) {
+  --i: 7.0;
+}
+[data-assemble-items] > :nth-child(12) {
+  --i: 7.7;
+}
+
+/* Pixel art scanning in, a row at a time from the top (GearPixels). */
+@keyframes pixel-row {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pixel-row {
+    animation: pixel-row 140ms var(--ease-reveal) both;
+    animation-delay: calc(var(--row, 0) * 9ms);
+  }
+}
+
+/* Reduced motion: nothing animates. Components that want a gentle fade here
+   opt in themselves; a blanket duration would make every style change animate. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
