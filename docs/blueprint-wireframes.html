@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Visual blueprint: wireframes for every chapter. Companion to docs/blueprint.md. -->
+</head><body style="margin:0">
+<title>Frank Fu Site Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=LXGW+WenKai+TC&display=swap">
+<style>
+/* Layout: one long plan on rice paper. Each chapter pairs a wireframe screen, drawn in the site's own squares, with plain notes beside it. */
+:root {
+  --paper: #EDEFEC;
+  --surface: #F7F8F6;
+  --ink: #1B1E24;
+  --ink-soft: #5F6670;
+  --grid: #CDD1D1;
+  --line: #A9AFB3;
+  --cinnabar: #C23B22;
+  --jade: #2B7A5F;
+  --font-ui: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-han: "LXGW WenKai TC", "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  --measure: 66ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13161B; --surface: #1A1E24; --ink: #E7E9E4; --ink-soft: #979DA6;
+    --grid: #2E333C; --line: #4A515C; --cinnabar: #E0563D; --jade: #4FB08B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13161B; --surface: #1A1E24; --ink: #E7E9E4; --ink-soft: #979DA6;
+  --grid: #2E333C; --line: #4A515C; --cinnabar: #E0563D; --jade: #4FB08B;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 56px 96px; display: grid; gap: 112px; }
+.han { font-family: var(--font-han); font-weight: 400; }
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.02; letter-spacing: -0.025em; }
+h2 { font-size: clamp(28px, 3.4vw, 36px); line-height: 1.12; }
+h3 { font-size: 22px; line-height: 1.2; }
+p { margin: 0; }
+a { color: inherit; text-decoration-color: var(--line); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--cinnabar); }
+a:focus-visible, button:focus-visible { outline: 1.5px solid var(--cinnabar); outline-offset: 3px; border-radius: 2px; }
+.soft { color: var(--ink-soft); }
+.small { font-size: 14px; }
+.tiny { font-size: 12.5px; }
+.num { font-variant-numeric: tabular-nums; }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; }
+
+/* ---------- intro ---------- */
+.intro { display: grid; gap: 28px; }
+.byline { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.byline .han { font-size: 28px; }
+.byline .latin { font-size: 17px; font-weight: 500; }
+.seal-dot { width: 22px; height: 22px; background: var(--cinnabar); border-radius: 1px; align-self: center; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; gap: 2px; }
+.seal-dot i { background: var(--surface); opacity: .85; display: block; }
+.lede { font-size: 19px; line-height: 1.55; max-width: 60ch; }
+.meta { display: flex; gap: 8px 24px; flex-wrap: wrap; font-size: 14px; color: var(--ink-soft); }
+.toc { display: flex; gap: 8px; flex-wrap: wrap; padding: 0; margin: 0; list-style: none; }
+.toc a { display: inline-block; padding: 6px 12px; border: 1px solid var(--line); border-radius: 2px; text-decoration: none; font-size: 14px; font-weight: 500; }
+.toc a:hover { border-color: var(--ink); }
+
+/* ---------- sections ---------- */
+section { display: grid; gap: 32px; scroll-margin-top: 24px; }
+.sec-head { display: grid; gap: 10px; max-width: var(--measure); }
+.sec-head p { color: var(--ink-soft); }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px 40px; margin: 0; padding: 0; list-style: none; }
+.principles li { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+.principles strong { font-weight: 600; }
+.aside-note { max-width: var(--measure); border-left: 2px solid var(--cinnabar); padding-left: 16px; font-size: 15px; }
+
+/* site map */
+.map-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-weight: 500; color: var(--ink-soft); font-size: 13px; }
+td:first-child { white-space: nowrap; }
+.strip { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.strip li {
+  height: calc(var(--h) * 24px); min-height: 34px;
+  border: 1px solid var(--line); border-radius: 2px;
+  padding: 7px 12px; display: flex; justify-content: space-between; gap: 12px; align-items: flex-start;
+  font-size: 14px; background: var(--surface);
+}
+.strip li.pinned { background-image: repeating-linear-gradient(135deg, transparent 0 7px, var(--grid) 7px 8px); }
+.strip .lbl { display: flex; gap: 10px; align-items: baseline; }
+.strip .lbl .han { font-size: 16px; min-width: 1.1em; }
+.strip .len { color: var(--ink-soft); font-size: 12.5px; white-space: nowrap; }
+
+/* chapters */
+.chapter { display: grid; gap: 18px; padding-top: 28px; border-top: 1px solid var(--line); }
+.ch-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.ch-head .han { font-size: 30px; line-height: 1; color: var(--cinnabar); min-width: 1.1em; }
+.ch-head .phase { margin-left: auto; font-size: 13px; color: var(--ink-soft); border: 1px solid var(--line); padding: 3px 9px; border-radius: 2px; }
+.ch-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.screen { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+.screen svg { display: block; width: 100%; height: auto; }
+.screen figcaption { font-size: 12.5px; color: var(--ink-soft); padding: 8px 12px; border-top: 1px solid var(--grid); }
+.notes { display: grid; gap: 14px; font-size: 15px; line-height: 1.55; }
+.notes dl { margin: 0; display: grid; gap: 12px; }
+.notes dt { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+.notes dd { margin: 2px 0 0; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
+.pair .chapter { border-top: 0; padding-top: 0; }
+
+/* design system */
+.sys-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px 48px; }
+.sys-block { display: grid; gap: 14px; align-content: start; }
+.sys-block > p { color: var(--ink-soft); font-size: 15px; max-width: var(--measure); }
+.swatches { display: grid; gap: 10px; }
+.sw-row { display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; font-size: 11.5px; }
+.sw-row .rowname { color: var(--ink-soft); font-size: 12.5px; align-self: center; }
+.sw { display: grid; gap: 4px; min-width: 0; }
+.sw b { display: block; height: 40px; border-radius: 2px; border: 1px solid var(--line); }
+.sw span { color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.specimen { display: grid; gap: 6px; }
+.specimen div { display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid var(--grid); padding-bottom: 6px; min-width: 0; }
+.specimen .sz { width: 52px; flex: none; color: var(--ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+.specimen .smp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; line-height: 1.15; }
+.curves { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.curve { display: grid; gap: 4px; font-size: 13px; }
+.curve svg { width: 100%; height: auto; border: 1px solid var(--grid); border-radius: 2px; background: var(--surface); }
+.curve code { color: var(--ink-soft); font-size: 11px; }
+
+/* build */
+.build-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px 56px; align-items: start; }
+.phases { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; counter-reset: ph; }
+.phases > li { counter-increment: ph; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px 12px; padding: 16px 0; border-top: 1px solid var(--grid); }
+.phases > li::before { content: counter(ph); font-weight: 600; font-variant-numeric: tabular-nums; width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 2px; font-size: 13px; grid-row: span 2; }
+.phases > li.now::before { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.phases h3 { font-size: 17px; }
+.phases ul { margin: 6px 0 0; padding-left: 18px; font-size: 14.5px; display: grid; gap: 4px; }
+.phases p { font-size: 14.5px; color: var(--ink-soft); }
+pre { margin: 0; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 3px; overflow-x: auto; font-size: 12.5px; line-height: 1.6; }
+.stack-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14.5px; }
+.stack-list li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; border-bottom: 1px solid var(--grid); padding-bottom: 8px; }
+.stack-list li span:first-child { color: var(--ink-soft); }
+.checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; }
+.checks li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; }
+.checks li::before { content: ""; width: 12px; height: 12px; border: 1.5px solid var(--ink-soft); border-radius: 1px; margin-top: 6px; }
+.checks li.done { color: var(--ink-soft); }
+.checks li.done::before { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--paper); }
+.needs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+.needs-grid h3 { font-size: 17px; margin-bottom: 12px; }
+.live { font-variant-numeric: tabular-nums; }
+
+/* svg paint classes */
+.f-ink { fill: var(--ink); } .f-soft { fill: var(--ink-soft); } .f-grid { fill: var(--grid); }
+.f-red { fill: var(--cinnabar); } .f-jade { fill: var(--jade); } .f-paper { fill: var(--paper); }
+.f-surface { fill: var(--surface); } .f-none { fill: none; } .f-line { fill: var(--line); }
+.s-ink { stroke: var(--ink); } .s-soft { stroke: var(--ink-soft); } .s-grid { stroke: var(--grid); }
+.s-line { stroke: var(--line); } .s-red { stroke: var(--cinnabar); } .s-jade { stroke: var(--jade); }
+.t { font-family: var(--font-ui); fill: var(--ink); }
+.t-soft { fill: var(--ink-soft); }
+.t-red { fill: var(--cinnabar); }
+.t-paper { fill: var(--paper); }
+.t-han { font-family: var(--font-han); }
+.t-sq { fill: url(#sq); }
+.dash { stroke-dasharray: 3 4; }
+
+@media (max-width: 860px) {
+  .map-grid, .ch-body, .build-grid { grid-template-columns: minmax(0, 1fr); }
+  .ch-head .phase { margin-left: 0; }
+  .curves { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wrap { gap: 88px; padding-block: 36px 72px; }
+}
+@media (max-width: 520px) {
+  .sw-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .sw-row .rowname { grid-column: 1 / -1; }
+  .stack-list li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="sq" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0.7" y="0.7" width="4.6" height="4.6" class="f-ink"/></pattern>
+    <pattern id="sqs" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0.7" y="0.7" width="4.6" height="4.6" class="f-soft"/></pattern>
+    <pattern id="sqg" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0.9" y="0.9" width="4.2" height="4.2" class="f-grid"/></pattern>
+    <pattern id="sqr" width="6" height="6" patternUnits="userSpaceOnUse"><rect x="0.7" y="0.7" width="4.6" height="4.6" class="f-red"/></pattern>
+    <pattern id="lat" width="10" height="10" patternUnits="userSpaceOnUse"><rect x="4.3" y="4.3" width="1.4" height="1.4" class="f-grid"/></pattern>
+  </defs>
+</svg>
+
+<main class="wrap">
+
+<!-- ============ intro ============ -->
+<header class="intro">
+  <div class="byline">
+    <span class="seal-dot" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="han" lang="zh-Hans">付优扬</span>
+    <span class="latin">Frank Fu</span>
+  </div>
+  <h1>Site blueprint</h1>
+  <p class="lede">The plan for the first build: how the site is organised, what each section looks like and how it moves, the design system everything shares, and the order we build it in.</p>
+  <div class="meta">
+    <span>Draft 2, 13 November 2026</span>
+    <span>youyangfu.com</span>
+    <span>Written spec in the repo: <code>docs/blueprint.md</code></span>
+    <span>Built so far: the <a href="https://claude.ai/artifact/YH13NwoCVuoUaeN1JFNYFL">opening sequence prototype</a></span>
+  </div>
+  <nav aria-label="On this page">
+    <ul class="toc">
+      <li><a href="#idea">The idea</a></li>
+      <li><a href="#sitemap">Site map</a></li>
+      <li><a href="#global">On every page</a></li>
+      <li><a href="#chapters">Chapters</a></li>
+      <li><a href="#system">Design system</a></li>
+      <li><a href="#build">Build plan</a></li>
+      <li><a href="#needs">What I need from you</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ============ idea ============ -->
+<section id="idea">
+  <div class="sec-head">
+    <h2>The idea</h2>
+    <p>Chinese characters are called 方块字, square block characters. You learned them inside the squares of 田字格 paper. Everything on this site is built from one material: small squares on one shared lattice, assembling into whatever each chapter needs.</p>
+  </div>
+  <ul class="principles">
+    <li><strong>One material</strong><span class="soft small">Everything that moves is made of squares on the same lattice: your name, the map, the chart, the avatar. Text stays real text, crisp and selectable.</span></li>
+    <li><strong>A quiet page with three loud moments</strong><span class="soft small">The opening, the flight to Auckland and the life chart. Everything between them is still, typographic and precise.</span></li>
+    <li><strong>The visitor drives the motion</strong><span class="soft small">Scrolling plays the scenes and the cursor plays the details. Only the opening and live data (clocks, the current candle) move on their own.</span></li>
+    <li><strong>Two scripts as equals</strong><span class="soft small">Chinese appears where it carries meaning: your name, places, chapter numerals. Never as decoration.</span></li>
+    <li><strong>Fast and kind</strong><span class="soft small">Every scene has a still version for slow phones and for people who turn motion off. Nothing important hides behind an animation.</span></li>
+  </ul>
+  <p class="aside-note">Chapters are numbered in 大写 financial numerals, <span class="han">壹 贰 叁 肆 伍 陆</span>. They are the forms written on cheques and invoices so an amount can't be altered, which suits a site about someone whose surname, 付, means "to pay", and whose life is drawn as a market chart.</p>
+</section>
+
+<!-- ============ site map ============ -->
+<section id="sitemap">
+  <div class="sec-head">
+    <h2>Site map</h2>
+    <p>The home page is one continuous scroll that tells the story in six chapters. A few separate pages hold the detail that doesn't belong in the story.</p>
+  </div>
+  <div class="map-grid">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Page</th><th scope="col">What it's for</th><th scope="col">Phase</th></tr></thead>
+        <tbody>
+          <tr><td><code>/</code></td><td>The story: opening plus six chapters</td><td>1</td></tr>
+          <tr><td><code>/work/[project]</code></td><td>One case study per project</td><td>1 template, 3 content</td></tr>
+          <tr><td><code>/resume</code></td><td>Your CV as one plain page, plus the PDF. The fast path for anyone in a hurry, and what search engines index for Youyang Fu.</td><td>1</td></tr>
+          <tr><td><code>/play/court</code><br><code>/play/table</code><br><code>/play/arcade</code></td><td>Full versions of the three personal rooms</td><td>4</td></tr>
+          <tr><td>404</td><td><span class="han">不中</span>, Henan dialect for "no good", with a rally game later</td><td>1 plain, 5 game</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <p class="tiny soft" style="margin-bottom:10px">The home page from top to bottom. Height shows how many screens of scrolling each chapter takes. Striped chapters pin in place while scrolling plays their scene.</p>
+      <ol class="strip" aria-label="Home page chapters in scroll order">
+        <li style="--h:1"><span class="lbl"><span class="han"> </span>Opening</span><span class="len">1 screen</span></li>
+        <li class="pinned" style="--h:3"><span class="lbl"><span class="han">壹</span>Two homes</span><span class="len">pinned, 3 screens</span></li>
+        <li class="pinned" style="--h:3"><span class="lbl"><span class="han">贰</span>The chart</span><span class="len">pinned, 3 screens</span></li>
+        <li style="--h:1.5"><span class="lbl"><span class="han">叁</span>Work</span><span class="len">1.5 screens</span></li>
+        <li style="--h:1"><span class="lbl"><span class="han">肆</span>Stack</span><span class="len">1 screen</span></li>
+        <li class="pinned" style="--h:3"><span class="lbl"><span class="han">伍</span>Off the clock</span><span class="len">pinned, sideways, 3 screens</span></li>
+        <li style="--h:1"><span class="lbl"><span class="han">陆</span>Let's connect</span><span class="len">1 screen</span></li>
+        <li style="--h:0.5"><span class="lbl"><span class="han"> </span>Footer</span><span class="len">half</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ global ============ -->
+<section id="global">
+  <div class="sec-head">
+    <h2>On every page</h2>
+    <p>The frame around the story. It stays small and out of the way, and every piece of it uses the same squares.</p>
+  </div>
+
+  <div class="ch-body">
+    <figure class="screen">
+      <svg viewBox="0 0 640 300" role="img" aria-label="Wireframe of the header, the Hold'em progress corner and the square-wipe page transition">
+        <!-- header -->
+        <rect x="16" y="16" width="608" height="52" rx="2" class="f-paper"/>
+        <rect x="32" y="31" width="22" height="22" class="f-red"/>
+        <rect x="35.5" y="34.5" width="6.5" height="6.5" class="f-surface" opacity=".85"/><rect x="44" y="34.5" width="6.5" height="6.5" class="f-surface" opacity=".85"/>
+        <rect x="35.5" y="43" width="6.5" height="6.5" class="f-surface" opacity=".85"/><rect x="44" y="43" width="6.5" height="6.5" class="f-surface" opacity=".85"/>
+        <text x="64" y="47" class="t" font-size="12" font-weight="500">Frank Fu</text>
+        <text x="326" y="47" class="t" font-size="12">Work</text>
+        <text x="370" y="47" class="t" font-size="12">About</text>
+        <text x="419" y="47" class="t" font-size="12">Play</text>
+        <text x="458" y="47" class="t" font-size="12">Contact</text>
+        <text x="516" y="47" class="t" font-size="12">Resume</text>
+        <rect x="592" y="33" width="16" height="16" rx="1" class="f-none s-ink" stroke-width="1.2"/>
+        <path d="M592 49 L608 33 L608 49 Z" class="f-ink"/>
+        <line x1="326" y1="53" x2="354" y2="53" class="s-red" stroke-width="1.5"/>
+        <text x="604" y="88" text-anchor="end" class="t t-soft" font-size="10">Colour mode: Light, Dark, Now</text>
+        <!-- holdem corner -->
+        <text x="32" y="128" class="t t-soft" font-size="10">Hold'em progress, bottom-right corner</text>
+        <rect x="32" y="142" width="22" height="30" rx="2" class="f-surface s-line"/>
+        <rect x="35" y="145" width="16" height="24" fill="url(#sqg)"/>
+        <rect x="58" y="142" width="22" height="30" rx="2" class="f-surface s-line"/>
+        <rect x="61" y="145" width="16" height="24" fill="url(#sqg)"/>
+        <text x="32" y="188" class="t t-soft" font-size="9">Your two cards</text>
+        <g>
+          <rect x="112" y="142" width="22" height="30" rx="2" class="f-paper s-ink"/><text x="116" y="156" class="t" font-size="10" font-weight="600">9</text><text x="116" y="168" class="t t-red" font-size="10">♥</text>
+          <rect x="138" y="142" width="22" height="30" rx="2" class="f-paper s-ink"/><text x="142" y="156" class="t" font-size="10" font-weight="600">K</text><text x="142" y="168" class="t" font-size="10">♠</text>
+          <rect x="164" y="142" width="22" height="30" rx="2" class="f-paper s-ink"/><text x="168" y="156" class="t" font-size="10" font-weight="600">4</text><text x="168" y="168" class="t t-red" font-size="10">♦</text>
+          <rect x="190" y="142" width="22" height="30" rx="2" class="f-surface s-line"/><rect x="193" y="145" width="16" height="24" fill="url(#sqg)"/>
+          <rect x="216" y="142" width="22" height="30" rx="2" class="f-surface s-line"/><rect x="219" y="145" width="16" height="24" fill="url(#sqg)"/>
+        </g>
+        <text x="112" y="188" class="t t-soft" font-size="9">Flop at 贰</text>
+        <text x="190" y="188" class="t t-soft" font-size="9">Turn 肆, river 伍</text>
+        <text x="32" y="214" class="t t-soft" font-size="9">Showdown at 陆. Hover a card for the fact it carries.</text>
+        <!-- page wipe -->
+        <text x="352" y="128" class="t t-soft" font-size="10">Page transition: a wave of squares from the click</text>
+        <rect x="352" y="140" width="252" height="132" rx="2" class="f-paper s-line"/>
+        <clipPath id="wipeFrame"><rect x="353" y="141" width="250" height="130"/></clipPath>
+        <clipPath id="wipe"><circle cx="420" cy="230" r="96"/></clipPath>
+        <g clip-path="url(#wipeFrame)">
+          <rect x="352" y="140" width="252" height="132" fill="url(#sq)" clip-path="url(#wipe)"/>
+          <circle cx="420" cy="230" r="96" class="f-none s-red" stroke-width="1" stroke-dasharray="2 4"/>
+        </g>
+        <circle cx="420" cy="230" r="4" class="f-red"/>
+      </svg>
+      <figcaption>Header, the poker progress corner and the page transition.</figcaption>
+    </figure>
+    <div class="notes">
+      <dl>
+        <dt>Header</dt>
+        <dd>Your seal links home. Work, About, Play, Contact and Resume sit on the right, with the current chapter underlined in cinnabar. It hides as you scroll down and comes back when you scroll up. On phones it becomes a menu button that opens a full-screen list.</dd>
+        <dt>Colour mode</dt>
+        <dd>One small square that cycles Light, Dark and Now. Now is the default and follows the real sun over Auckland. It's set before the first paint, so the page never flashes the wrong colours.</dd>
+        <dt>Hold'em progress</dt>
+        <dd>Visitors are dealt two face-down cards at the opening. The flop turns over at The chart, the turn at Stack, the river at Off the clock, and the showdown happens at Let's connect. It doubles as the page's progress indicator.</dd>
+        <dt>Page transition</dt>
+        <dd>Squares sweep out from where you clicked, the page changes underneath, then they clear. About half a second.</dd>
+        <dt>Cursor and sound</dt>
+        <dd>The normal cursor. Squares near it grow slightly, as in the prototype. Sound plays only when you ask for it, like tapping your name's pinyin.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ chapters ============ -->
+<section id="chapters">
+  <div class="sec-head">
+    <h2>Chapters</h2>
+    <p>What each part of the home page looks like, how it moves, and what content it needs from you. Grey bars mark content we don't have yet.</p>
+  </div>
+
+  <!-- opening -->
+  <article class="chapter" id="ch-opening">
+    <header class="ch-head"><h3>Opening</h3><span class="phase">Phase 1</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of the opening: Frank Fu in squares with the seal, a one-line introduction and a scroll cue">
+          <rect x="24" y="22" width="16" height="16" class="f-red"/>
+          <text x="388" y="35" class="t t-soft" font-size="10">Work</text><text x="424" y="35" class="t t-soft" font-size="10">About</text><text x="465" y="35" class="t t-soft" font-size="10">Play</text><text x="498" y="35" class="t t-soft" font-size="10">Contact</text><text x="546" y="35" class="t t-soft" font-size="10">Resume</text>
+          <rect x="604" y="24" width="12" height="12" class="f-none s-ink"/>
+          <text x="113" y="215" class="t t-sq" font-size="104" font-weight="600" textLength="390" lengthAdjust="spacingAndGlyphs">Frank Fu</text>
+          <rect x="514" y="175" width="40" height="40" class="f-red"/>
+          <text x="534" y="193" text-anchor="middle" class="t t-han t-paper" font-size="14">扬付</text>
+          <text x="534" y="210" text-anchor="middle" class="t t-han t-paper" font-size="14">印优</text>
+          <text x="320" y="258" text-anchor="middle" class="t t-soft" font-size="12">Software engineering student at the University of Auckland. Born in Zhengzhou, raised in Auckland.</text>
+          <text x="320" y="350" text-anchor="middle" class="t t-soft" font-size="10">Scroll</text>
+          <line x1="320" y1="358" x2="320" y2="378" class="s-soft"/>
+          <rect x="574" y="346" width="18" height="26" rx="2" class="f-surface s-line"/><rect x="577" y="349" width="12" height="20" fill="url(#sqg)"/>
+          <rect x="596" y="346" width="18" height="26" rx="2" class="f-surface s-line"/><rect x="599" y="349" width="12" height="20" fill="url(#sqg)"/>
+        </svg>
+        <figcaption>The resting state after the sequence. The writing itself is in the prototype.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>The prototype: a faint 米字格 grid, 付优扬 writing itself in 17 strokes, the squares flying into Frank Fu, the seal stamping. Then one plain line about who you are.</dd>
+          <dt>What moves</dt>
+          <dd>About 6 seconds the first time, and scrolling skips it. Repeat visits get a 1.5-second version. Hover the name to switch scripts. Later, hovering a character shows its parts (person, hand, rising sun), and tapping the pinyin plays your recording.</dd>
+          <dt>The intro line</dt>
+          <dd>"Software engineering student at the University of Auckland. Born in Zhengzhou, raised in Auckland." It names no year, so it never goes stale. Wherever your year of study does appear (resume, chart), the site works it out from your 2024 start, and it switches to graduate wording after 2027.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- two homes -->
+  <article class="chapter" id="ch-homes">
+    <header class="ch-head"><span class="han" aria-hidden="true">壹</span><h3>Two homes</h3><span class="phase">Phase 1 layout, phase 2 scene</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of Two homes: a square-lattice map with Zhengzhou and Auckland mirrored across the equator, the flight arc and a live life-split bar">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">壹</text><text x="44" y="37" class="t t-soft" font-size="11">Two homes</text>
+          <rect x="24" y="58" width="380" height="296" fill="url(#lat)"/>
+          <line x1="24" y1="210" x2="404" y2="210" class="s-line dash"/>
+          <text x="30" y="204" class="t t-soft" font-size="9">Equator</text>
+          <g class="s-red" stroke-width="1.6">
+            <line x1="132" y1="140" x2="168" y2="140"/><line x1="150" y1="122" x2="150" y2="158"/>
+            <line x1="137" y1="127" x2="163" y2="153"/><line x1="163" y1="127" x2="137" y2="153"/>
+          </g>
+          <rect x="146" y="136" width="8" height="8" class="f-red"/>
+          <text x="126" y="112" text-anchor="end" class="t" font-size="11"><tspan class="t-han" font-size="13">郑州</tspan> Zhengzhou</text>
+          <text x="126" y="126" text-anchor="end" class="t t-soft" font-size="10">34.7°N</text>
+          <path d="M150 140 Q300 110 330 284" class="f-none s-ink" stroke-width="1.3"/>
+          <rect x="303" y="209" width="8" height="8" class="f-ink"/>
+          <text x="234" y="104" class="t num" font-size="14" font-weight="600">10,163 km</text>
+          <text x="314" y="104" class="t t-soft" font-size="10">clock +5 h</text>
+          <rect x="326" y="280" width="8" height="8" class="f-ink"/>
+          <text x="342" y="300" class="t" font-size="11">Auckland</text>
+          <text x="342" y="314" class="t t-soft" font-size="10">36.8°S</text>
+          <text x="430" y="104" class="t" font-size="12">Born in Zhengzhou</text>
+          <text x="430" y="120" class="t t-soft" font-size="11">March 2006</text>
+          <text x="430" y="148" class="t" font-size="12">Arrived in Auckland</text>
+          <text x="430" y="164" class="t t-soft" font-size="11">July 2016</text>
+          <rect x="430" y="190" width="93" height="10" class="f-red"/>
+          <rect x="523" y="190" width="93" height="10" class="f-ink"/>
+          <text x="430" y="216" class="t t-soft" font-size="9">Zhengzhou, 10.3 years</text>
+          <text x="616" y="216" text-anchor="end" class="t t-soft" font-size="9">Auckland, counting</text>
+          <text x="430" y="258" class="t num live-svg" font-size="24" font-weight="600">50.03%</text>
+          <text x="430" y="276" class="t t-soft" font-size="10.5">of my life in Aotearoa, live</text>
+          <rect x="430" y="300" width="98" height="24" rx="2" class="f-none s-line"/>
+          <text x="441" y="316" class="t" font-size="10.5">Flip the world</text>
+          <g font-size="9.5">
+            <rect x="24" y="372" width="6" height="6" class="f-line"/><text x="34" y="378" class="t t-soft">Zhengzhou</text>
+            <rect x="104" y="372" width="6" height="6" class="f-ink"/><text x="114" y="378" class="t">The flight</text>
+            <rect x="182" y="372" width="6" height="6" class="f-line"/><text x="192" y="378" class="t t-soft">Auckland</text>
+            <rect x="254" y="372" width="6" height="6" class="f-line"/><text x="264" y="378" class="t t-soft">The split</text>
+          </g>
+        </svg>
+        <figcaption>Pinned for three screens. The four steps along the bottom play as you scroll.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>A map made of squares. Zhengzhou lights up and its 米-shaped high-speed rail lines draw outward. The view pulls back, an arc flies 10,163 km to Auckland while the clock jumps forward, and then the split of your life appears.</dd>
+          <dt>What moves</dt>
+          <dd>Scrolling scrubs the flight. "Flip the world" mirrors the map across the equator, and Zhengzhou at 34.7°N lands almost exactly on Auckland's latitude, 36.8°S. The percentage counts up live: right now it reads <strong class="live" id="livePct">50.0%</strong> of your life in Aotearoa, assuming you arrived in mid-July.</dd>
+          <dt>Content needed</dt>
+          <dd>A short paragraph on growing up between the two. The exact arrival day if you can find it.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- the chart -->
+  <article class="chapter" id="ch-chart">
+    <header class="ch-head"><span class="han" aria-hidden="true">贰</span><h3>The chart</h3><span class="phase">Phase 1 static, phase 2 scene</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of the life chart: candles for each chapter, red rising in the Zhengzhou years, a gap at the move, green rising in the Auckland years, with a crosshair and a detail card">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">贰</text><text x="44" y="37" class="t t-soft" font-size="11">The chart</text>
+          <line x1="24" y1="50" x2="616" y2="50" class="s-grid"/><line x1="24" y1="66" x2="616" y2="66" class="s-grid"/>
+          <g font-size="9.5">
+            <text x="24" y="62" class="t">BDMT</text><text x="56" y="62" class="t" style="fill:var(--jade)">▲</text><text x="68" y="62" class="t t-soft">3 sessions this week</text>
+            <text x="180" y="62" class="t">SLEEP</text><text x="215" y="62" class="t t-red">▼</text><text x="227" y="62" class="t t-soft">exam week</text>
+            <text x="300" y="62" class="t">HOLDEM</text><text x="346" y="62" class="t" style="fill:var(--jade)">▲</text><text x="358" y="62" class="t t-soft">one good night</text>
+            <text x="456" y="62" class="t">COFFEE</text><text x="499" y="62" class="t" style="fill:var(--jade)">▲</text><text x="511" y="62" class="t t-soft">steady</text>
+          </g>
+          <text x="24" y="92" class="t t-han" font-size="12">付优扬</text><text x="64" y="92" class="t" font-size="10.5" font-weight="600">FYY0603</text>
+          <rect x="116" y="82" width="42" height="14" rx="2" class="f-none s-line"/><text x="122" y="92" class="t t-soft" font-size="9">ZCE ¥</text>
+          <text x="300" y="92" class="t" font-size="10.5" font-weight="600">FRK</text>
+          <rect x="326" y="82" width="44" height="14" rx="2" class="f-none s-line"/><text x="332" y="92" class="t t-soft" font-size="9">NZX $</text>
+          <g class="s-grid"><line x1="24" y1="130" x2="580" y2="130"/><line x1="24" y1="180" x2="580" y2="180"/><line x1="24" y1="230" x2="580" y2="230"/><line x1="24" y1="280" x2="580" y2="280"/></g>
+          <g font-size="9" class="t t-soft"><text x="588" y="133">40</text><text x="588" y="183">30</text><text x="588" y="233">20</text><text x="588" y="283">10</text></g>
+          <line x1="290" y1="102" x2="290" y2="306" class="s-red dash"/>
+          <!-- Zhengzhou years: red up, jade down -->
+          <line x1="71" y1="215" x2="71" y2="280" class="s-red"/><rect x="60" y="230" width="22" height="40" class="f-red"/>
+          <line x1="131" y1="190" x2="131" y2="245" class="s-red"/><rect x="120" y="205" width="22" height="30" class="f-red"/>
+          <line x1="191" y1="196" x2="191" y2="232" class="s-jade"/><rect x="180" y="205" width="22" height="17" class="f-jade"/>
+          <line x1="251" y1="165" x2="251" y2="228" class="s-red"/><rect x="240" y="180" width="22" height="40" class="f-red"/>
+          <!-- Auckland years: jade up, red down -->
+          <line x1="331" y1="220" x2="331" y2="292" class="s-red"/><rect x="320" y="230" width="22" height="32" class="f-red"/>
+          <line x1="373" y1="205" x2="373" y2="266" class="s-jade"/><rect x="362" y="214" width="22" height="44" class="f-jade"/>
+          <line x1="415" y1="160" x2="415" y2="224" class="s-jade"/><rect x="404" y="176" width="22" height="40" class="f-jade"/>
+          <line x1="457" y1="136" x2="457" y2="186" class="s-jade"/><rect x="446" y="150" width="22" height="28" class="f-jade"/>
+          <line x1="499" y1="112" x2="499" y2="160" class="s-jade"/><rect x="488" y="126" width="22" height="26" class="f-jade"/>
+          <rect x="530" y="118" width="22" height="10" class="f-none s-jade" stroke-dasharray="2 2"/>
+          <!-- crosshair + card -->
+          <line x1="457" y1="102" x2="457" y2="306" class="s-soft dash"/>
+          <line x1="24" y1="150" x2="580" y2="150" class="s-soft dash"/>
+          <rect x="580" y="142" width="34" height="16" rx="1" class="f-ink"/><text x="584" y="154" class="t t-paper num" font-size="9.5">34.2</text>
+          <rect x="470" y="194" width="106" height="76" rx="2" class="f-surface s-line"/>
+          <text x="478" y="210" class="t" font-size="9.5" font-weight="600">Uni of Auckland, yr 1</text>
+          <text x="478" y="224" class="t t-soft" font-size="9">Close: how it ended</text>
+          <rect x="478" y="232" width="18" height="5" class="f-jade"/><text x="500" y="237" class="t" font-size="9">High</text><rect x="524" y="232" width="44" height="5" class="f-grid"/>
+          <rect x="478" y="246" width="18" height="5" class="f-red"/><text x="500" y="251" class="t" font-size="9">Low</text><rect x="524" y="246" width="38" height="5" class="f-grid"/>
+          <rect x="478" y="258" width="80" height="5" class="f-grid"/>
+          <!-- flags + axis -->
+          <g font-size="9" class="t">
+            <line x1="71" y1="306" x2="71" y2="318" class="s-line"/><rect x="68" y="318" width="6" height="6" class="f-ink"/><text x="78" y="324">Born</text>
+            <rect x="287" y="318" width="6" height="6" class="f-red"/><text x="297" y="324">Moved to NZ, exchange switched</text>
+            <line x1="457" y1="306" x2="457" y2="318" class="s-line"/><rect x="454" y="318" width="6" height="6" class="f-ink"/><text x="464" y="324">UoA</text>
+            <line x1="541" y1="306" x2="541" y2="318" class="s-line"/><rect x="538" y="318" width="6" height="6" class="f-ink"/><text x="548" y="324">Crossover</text>
+          </g>
+          <g font-size="9" class="t t-soft"><text x="24" y="346">2006</text><text x="279" y="346">2016</text><text x="530" y="346">2026</text></g>
+          <rect x="530" y="364" width="40" height="20" rx="2" class="f-ink"/><text x="538" y="378" class="t t-paper" font-size="9.5">Chart</text>
+          <rect x="574" y="364" width="40" height="20" rx="2" class="f-none s-line"/><text x="586" y="378" class="t" font-size="9.5">List</text>
+        </svg>
+        <figcaption>Red rises in the Zhengzhou years, green rises after the move. Hovering a candle snaps the crosshair and opens its card.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>Your life as a candlestick chart, one candle per chapter. The Zhengzhou years trade on the Zhengzhou Commodity Exchange: prices in ¥, red means up. July 2016 opens a gap and the chart lists on NZX: prices in $, green means up.</dd>
+          <dt>How to read a candle</dt>
+          <dd>Open and close are how the chapter started and ended. The top of the wick is its best moment and the bottom is its hardest. Flags under the axis mark events: born, moved, started university, the crossover.</dd>
+          <dt>What moves</dt>
+          <dd>Candles draw one by one as you scroll, then the view zooms into the Auckland years, where school, university and internships sit. The crosshair snaps between candles, axis numbers roll like an odometer, and the current candle is still forming. A ticker tape runs along the top.</dd>
+          <dt>Also</dt>
+          <dd>A List switch shows the same chapters as plain text, for skimming and for screen readers.</dd>
+          <dt>Content needed</dt>
+          <dd>Your chapters with dates, and a line each for the best and hardest moment. You decide how personal those get.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- work -->
+  <article class="chapter" id="ch-work">
+    <header class="ch-head"><span class="han" aria-hidden="true">叁</span><h3>Work</h3><span class="phase">Phase 1 layout, phase 3 content</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of Work: a list of projects with columns for year, role, stack and status, and a preview image following the cursor">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">叁</text><text x="44" y="37" class="t t-soft" font-size="11">Work</text>
+          <g font-size="10" class="t t-soft"><text x="24" y="82">Project</text><text x="300" y="82">Year</text><text x="356" y="82">Role</text><text x="452" y="82">Stack</text><text x="616" y="82" text-anchor="end">Status</text></g>
+          <line x1="24" y1="92" x2="616" y2="92" class="s-line"/>
+          <text x="24" y="130" class="t" font-size="16" font-weight="500">WEB3 UoA</text>
+          <text x="300" y="130" class="t num" font-size="11">2026</text><text x="356" y="130" class="t" font-size="11">PM, developer</text><text x="452" y="130" class="t" font-size="11">React, Next.js</text><text x="616" y="130" text-anchor="end" class="t t-soft" font-size="11">Live</text>
+          <line x1="24" y1="148" x2="616" y2="148" class="s-grid"/>
+          <rect x="24" y="148" width="592" height="46" class="f-paper"/>
+          <rect x="34" y="161" width="150" height="14" rx="1" class="f-ink"/>
+          <rect x="300" y="164" width="30" height="8" class="f-grid"/><rect x="356" y="164" width="70" height="8" class="f-grid"/><rect x="452" y="164" width="90" height="8" class="f-grid"/><rect x="574" y="164" width="42" height="8" class="f-grid"/>
+          <line x1="24" y1="194" x2="616" y2="194" class="s-grid"/>
+          <rect x="24" y="207" width="190" height="14" rx="1" class="f-soft"/><rect x="300" y="210" width="30" height="8" class="f-grid"/><rect x="356" y="210" width="60" height="8" class="f-grid"/><rect x="452" y="210" width="80" height="8" class="f-grid"/><rect x="580" y="210" width="36" height="8" class="f-grid"/>
+          <line x1="24" y1="240" x2="616" y2="240" class="s-grid"/>
+          <rect x="24" y="253" width="130" height="14" rx="1" class="f-soft"/><rect x="300" y="256" width="30" height="8" class="f-grid"/><rect x="356" y="256" width="74" height="8" class="f-grid"/><rect x="452" y="256" width="70" height="8" class="f-grid"/><rect x="570" y="256" width="46" height="8" class="f-grid"/>
+          <line x1="24" y1="286" x2="616" y2="286" class="s-grid"/>
+          <rect x="24" y="299" width="170" height="14" rx="1" class="f-soft"/><rect x="300" y="302" width="30" height="8" class="f-grid"/><rect x="356" y="302" width="56" height="8" class="f-grid"/><rect x="452" y="302" width="96" height="8" class="f-grid"/><rect x="578" y="302" width="38" height="8" class="f-grid"/>
+          <line x1="24" y1="332" x2="616" y2="332" class="s-grid"/>
+          <rect x="226" y="150" width="148" height="100" rx="2" class="f-surface s-line"/>
+          <rect x="232" y="156" width="136" height="88" fill="url(#sqs)" opacity=".55"/>
+          <path d="M214 176 L214 196 L219 191 L223 200 L226 199 L222 190 L229 190 Z" class="f-ink s-paper"/>
+          <text x="24" y="364" class="t t-soft" font-size="10">Each row opens its case study page.</text>
+        </svg>
+        <figcaption>A quiet list. The hovered row lifts and a preview assembles from squares beside the cursor.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>A plain index of projects: name, year, role, stack, status. It reads well at a glance and stays out of the chart's way.</dd>
+          <dt>What moves</dt>
+          <dd>Hovering a row brings up a preview image that follows the cursor and assembles from squares. Clicking opens the project's case study with the square-wipe transition.</dd>
+          <dt>Case study page</dt>
+          <dd>Title, a row of facts (year, role, stack, links), one hero image, then short sections: the problem, what you built, the decisions, the outcome. Ends with the next project.</dd>
+          <dt>Content needed</dt>
+          <dd>Each project's name, year, role, stack, one or two sentences, links and an image.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- stack -->
+  <article class="chapter" id="ch-stack">
+    <header class="ch-head"><span class="han" aria-hidden="true">肆</span><h3>Stack</h3><span class="phase">Phase 1</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of Stack: five towers of rectangular casino plaques, one per area, with one plaque lifted and labelled">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">肆</text><text x="44" y="37" class="t t-soft" font-size="11">Stack</text>
+          <g transform="translate(0,-56)">
+          <g>
+            <!-- tower 1: 6 plaques -->
+            <g class="f-surface s-line">
+              <rect x="38" y="306" width="84" height="12" rx="2"/><rect x="38" y="291" width="84" height="12" rx="2"/><rect x="38" y="276" width="84" height="12" rx="2"/>
+              <rect x="38" y="261" width="84" height="12" rx="2"/><rect x="38" y="246" width="84" height="12" rx="2"/>
+            </g>
+            <rect x="38" y="222" width="84" height="12" rx="2" class="f-ink"/>
+            <g class="f-surface s-line">
+              <rect x="158" y="306" width="84" height="12" rx="2"/><rect x="158" y="291" width="84" height="12" rx="2"/><rect x="158" y="276" width="84" height="12" rx="2"/><rect x="158" y="261" width="84" height="12" rx="2"/><rect x="158" y="246" width="84" height="12" rx="2"/>
+              <rect x="278" y="306" width="84" height="12" rx="2"/><rect x="278" y="291" width="84" height="12" rx="2"/><rect x="278" y="276" width="84" height="12" rx="2"/><rect x="278" y="261" width="84" height="12" rx="2"/>
+              <rect x="398" y="306" width="84" height="12" rx="2"/><rect x="398" y="291" width="84" height="12" rx="2"/><rect x="398" y="276" width="84" height="12" rx="2"/>
+              <rect x="518" y="306" width="84" height="12" rx="2"/><rect x="518" y="291" width="84" height="12" rx="2"/><rect x="518" y="276" width="84" height="12" rx="2"/><rect x="518" y="261" width="84" height="12" rx="2"/>
+            </g>
+            <g class="s-grid">
+              <line x1="48" y1="306" x2="48" y2="318"/><line x1="112" y1="306" x2="112" y2="318"/>
+              <line x1="168" y1="306" x2="168" y2="318"/><line x1="232" y1="306" x2="232" y2="318"/>
+              <line x1="288" y1="306" x2="288" y2="318"/><line x1="352" y1="306" x2="352" y2="318"/>
+              <line x1="408" y1="306" x2="408" y2="318"/><line x1="472" y1="306" x2="472" y2="318"/>
+              <line x1="528" y1="306" x2="528" y2="318"/><line x1="592" y1="306" x2="592" y2="318"/>
+            </g>
+          </g>
+          <rect x="132" y="168" width="150" height="44" rx="2" class="f-surface s-line"/>
+          <text x="142" y="186" class="t" font-size="11" font-weight="600">TypeScript</text>
+          <text x="142" y="202" class="t t-soft" font-size="10">3 years, used in 4 projects</text>
+          <line x1="122" y1="228" x2="132" y2="212" class="s-line"/>
+          <g font-size="10" class="t t-soft" text-anchor="middle">
+            <text x="80" y="340">Languages</text><text x="200" y="340">Frontend</text><text x="320" y="340">Backend</text><text x="440" y="340">Data</text><text x="560" y="340">Tools</text>
+          </g>
+          </g>
+        </svg>
+        <figcaption>Casino plaques, the rectangular chips used for high stakes. One plaque per tool.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>Towers of plaques, the rectangular high-value chips European casinos use. They fit the poker side of you and the squares. One tower per area, one plaque per tool. A taller tower means more use.</dd>
+          <dt>What moves</dt>
+          <dd>Hovering lifts a plaque and shows how long you've used it and which projects used it, linked. On phones the towers lie down into rows.</dd>
+          <dt>Content needed</dt>
+          <dd>Your tools, grouped, with rough years of use.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- off the clock -->
+  <article class="chapter" id="ch-play">
+    <header class="ch-head"><span class="han" aria-hidden="true">伍</span><h3>Off the clock</h3><span class="phase">Phase 1 placeholders, phase 4 rooms</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of Off the clock: three rooms side by side. Court with a square-built avatar and gear hotspots, Table with Hold'em cards, Arcade with game save files">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">伍</text><text x="44" y="37" class="t t-soft" font-size="11">Off the clock</text>
+          <g class="f-none s-line"><rect x="24" y="60" width="190" height="280" rx="2"/><rect x="225" y="60" width="190" height="280" rx="2"/><rect x="426" y="60" width="190" height="280" rx="2"/></g>
+          <!-- court -->
+          <text x="36" y="82" class="t" font-size="12" font-weight="600">Court</text><text x="74" y="82" class="t t-han t-soft" font-size="12">球场</text>
+          <g class="s-grid f-none"><rect x="44" y="100" width="150" height="220"/><line x1="44" y1="210" x2="194" y2="210"/><line x1="119" y1="100" x2="119" y2="320"/></g>
+          <circle cx="104" cy="132" r="12" fill="url(#sq)"/>
+          <rect x="89" y="148" width="30" height="66" rx="3" fill="url(#sq)"/>
+          <rect x="90" y="214" width="12" height="70" fill="url(#sq)"/><rect x="106" y="214" width="12" height="70" fill="url(#sq)"/>
+          <line x1="117" y1="154" x2="146" y2="116" class="s-ink" stroke-width="5" stroke-linecap="square"/>
+          <ellipse cx="156" cy="100" rx="10" ry="14" class="f-none s-ink" stroke-width="2" transform="rotate(30 156 100)"/>
+          <circle cx="156" cy="100" r="3.5" class="f-red"/><line x1="160" y1="100" x2="178" y2="100" class="s-red"/><text x="180" y="103" class="t" font-size="9">Racket</text>
+          <circle cx="104" cy="176" r="3.5" class="f-red"/><line x1="108" y1="176" x2="140" y2="176" class="s-red"/><text x="143" y="179" class="t" font-size="9">Shirt</text>
+          <circle cx="96" cy="282" r="3.5" class="f-red"/><line x1="100" y1="282" x2="140" y2="282" class="s-red"/><text x="143" y="285" class="t" font-size="9">Shoes</text>
+          <rect x="36" y="306" width="78" height="22" rx="2" class="f-ink"/><text x="44" y="321" class="t t-paper" font-size="9.5">Smash meter</text>
+          <!-- table -->
+          <text x="237" y="82" class="t" font-size="12" font-weight="600">Table</text><text x="274" y="82" class="t t-han t-soft" font-size="12">牌桌</text>
+          <text x="245" y="108" class="t t-soft" font-size="9">My favourite hand</text>
+          <rect x="245" y="116" width="32" height="44" rx="2" class="f-paper s-ink"/><text x="251" y="134" class="t" font-size="12" font-weight="600">?</text>
+          <rect x="283" y="116" width="32" height="44" rx="2" class="f-paper s-ink"/><text x="289" y="134" class="t" font-size="12" font-weight="600">?</text>
+          <rect x="245" y="196" width="26" height="36" rx="2" class="f-paper s-ink"/>
+          <rect x="276" y="196" width="26" height="36" rx="2" class="f-paper s-ink"/>
+          <rect x="307" y="196" width="26" height="36" rx="2" class="f-paper s-ink"/>
+          <rect x="338" y="196" width="26" height="36" rx="2" class="f-surface s-line"/><rect x="341" y="199" width="20" height="30" fill="url(#sqg)"/>
+          <rect x="369" y="196" width="26" height="36" rx="2" class="f-surface s-line"/><rect x="372" y="199" width="20" height="30" fill="url(#sqg)"/>
+          <text x="245" y="250" class="t t-soft" font-size="9">Flop, turn, river</text>
+          <rect x="245" y="306" width="74" height="22" rx="2" class="f-ink"/><text x="253" y="321" class="t t-paper" font-size="9.5">Play a hand</text>
+          <!-- arcade -->
+          <text x="438" y="82" class="t" font-size="12" font-weight="600">Arcade</text><text x="482" y="82" class="t t-han t-soft" font-size="12">游戏厅</text>
+          <g>
+            <rect x="438" y="98" width="166" height="54" rx="2" class="f-surface s-line"/><rect x="446" y="106" width="38" height="38" fill="url(#sqs)" opacity=".6"/><rect x="492" y="110" width="80" height="9" class="f-ink"/><text x="492" y="136" class="t num" font-size="9.5">312 h</text><rect x="530" y="129" width="50" height="7" class="f-grid"/>
+            <rect x="438" y="162" width="166" height="54" rx="2" class="f-surface s-line"/><rect x="446" y="170" width="38" height="38" fill="url(#sqs)" opacity=".6"/><rect x="492" y="174" width="64" height="9" class="f-ink"/><text x="492" y="200" class="t num" font-size="9.5">140 h</text><rect x="530" y="193" width="44" height="7" class="f-grid"/>
+            <rect x="438" y="226" width="166" height="54" rx="2" class="f-surface s-line"/><rect x="446" y="234" width="38" height="38" fill="url(#sqs)" opacity=".6"/><rect x="492" y="238" width="90" height="9" class="f-ink"/><text x="492" y="264" class="t num" font-size="9.5">88 h</text><rect x="530" y="257" width="40" height="7" class="f-grid"/>
+          </g>
+          <rect x="438" y="306" width="72" height="22" rx="2" class="f-ink"/><text x="446" y="321" class="t t-paper" font-size="9.5">Rally game</text>
+          <line x1="24" y1="370" x2="616" y2="370" class="s-grid" stroke-width="2"/>
+          <line x1="24" y1="370" x2="214" y2="370" class="s-ink" stroke-width="2"/>
+          <text x="616" y="388" text-anchor="end" class="t t-soft" font-size="9">Scrolling moves the rooms sideways</text>
+        </svg>
+        <figcaption>Three rooms. Hours and names in the Arcade are placeholders.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>Three rooms side by side. The page pins and scrolling moves them sideways. On phones they stack.</dd>
+          <dt>Court</dt>
+          <dd>You, built from cubes, standing in your kit with the racket raised. Hover the racket, strings, shirt or shoes for the gear and specs. The smash meter turns a flick of the mouse or a swipe into km/h and compares it with the world record.</dd>
+          <dt>Table</dt>
+          <dd>Your favourite starting hand and a hand to play against you. The full table lives at <code>/play/table</code>.</dd>
+          <dt>Arcade</dt>
+          <dd>The games you play as save files: hours, rank, main. Plus the one-button rally game.</dd>
+          <dt>Content needed</dt>
+          <dd>Gear list, the games you play, your favourite starting hand, the face photo.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- connect -->
+  <article class="chapter" id="ch-connect">
+    <header class="ch-head"><span class="han" aria-hidden="true">陆</span><h3>Let's connect</h3><span class="phase">Phase 1, working</span></header>
+    <div class="ch-body">
+      <figure class="screen">
+        <svg viewBox="0 0 640 400" role="img" aria-label="Wireframe of Let's connect: heading and links on the left, a form with name, email, topic chips and message on the right, and a send button with the seal beside it">
+          <text x="24" y="38" class="t t-han t-red" font-size="16">陆</text><text x="44" y="37" class="t t-soft" font-size="11">Let's connect</text>
+          <text x="24" y="114" class="t" font-size="30" font-weight="600" textLength="196" lengthAdjust="spacingAndGlyphs">Let's connect</text>
+          <text x="24" y="140" class="t t-soft" font-size="11">Work, a badminton hit, or just hello.</text>
+          <g font-size="12" class="t">
+            <text x="24" y="200">GitHub</text><line x1="24" y1="204" x2="64" y2="204" class="s-line"/>
+            <text x="24" y="226">LinkedIn</text><line x1="24" y1="230" x2="72" y2="230" class="s-line"/>
+            <text x="24" y="252">Email</text><rect x="62" y="241" width="34" height="15" rx="2" class="f-none s-line"/><text x="68" y="252" class="t t-soft" font-size="9">Copy</text>
+            <text x="24" y="278">Resume</text><line x1="24" y1="282" x2="70" y2="282" class="s-line"/>
+          </g>
+          <g font-size="9" class="t t-soft"><text x="300" y="84">Name</text><text x="466" y="84">Email</text><text x="300" y="136">What's it about?</text><text x="300" y="190">Message</text></g>
+          <rect x="300" y="90" width="150" height="28" rx="2" class="f-paper s-line"/>
+          <rect x="466" y="90" width="150" height="28" rx="2" class="f-paper s-line"/>
+          <g font-size="9.5">
+            <rect x="300" y="144" width="40" height="22" rx="2" class="f-none s-line"/><text x="309" y="158" class="t">Work</text>
+            <rect x="346" y="144" width="80" height="22" rx="2" class="f-none s-line"/><text x="355" y="158" class="t">Just saying hi</text>
+            <rect x="432" y="144" width="80" height="22" rx="2" class="f-ink"/><text x="441" y="158" class="t t-paper">Badminton hit</text>
+            <rect x="518" y="144" width="66" height="22" rx="2" class="f-none s-line"/><text x="527" y="158" class="t">Poker night</text>
+          </g>
+          <rect x="300" y="196" width="316" height="94" rx="2" class="f-paper s-line"/>
+          <rect x="300" y="306" width="72" height="30" rx="2" class="f-ink"/><text x="323" y="325" class="t t-paper" font-size="11" font-weight="500">Send</text>
+          <rect x="382" y="310" width="22" height="22" class="f-red" opacity=".35"/>
+          <text x="300" y="360" class="t t-soft" font-size="10">It's 9:40 pm in Auckland, so expect a reply tomorrow.</text>
+        </svg>
+        <figcaption>The faded seal beside Send stamps the message when it goes.</figcaption>
+      </figure>
+      <div class="notes">
+        <dl>
+          <dt>What you see</dt>
+          <dd>A short form: name, email, a topic chip that becomes the subject line, and a message. Your links sit beside it, with a copy button for your email.</dd>
+          <dt>What moves</dt>
+          <dd>On send, the message folds into a square, your seal stamps it, and the button reads "Sent". If something fails, it says what went wrong and keeps the message. The note under the button uses Auckland's current time to say when you'll likely reply.</dd>
+          <dt>Under the hood</dt>
+          <dd>A server action checks the fields and sends the email to you through Resend. Your address never appears in the page, and a hidden decoy field plus rate limiting keep spam out.</dd>
+          <dt>Content needed</dt>
+          <dd>The address the messages should go to, and your links.</dd>
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <!-- footer + 404 + resume -->
+  <div class="pair">
+    <article class="chapter" id="ch-footer">
+      <header class="ch-head"><h3>Footer</h3><span class="phase">Phase 1</span></header>
+      <figure class="screen">
+        <svg viewBox="0 0 320 170" role="img" aria-label="Wireframe of the footer with the seal, live clocks for Auckland and Zhengzhou, the life split and links">
+          <rect x="16" y="22" width="20" height="20" class="f-red"/>
+          <text x="52" y="30" class="t t-soft" font-size="8.5">Auckland</text><text x="52" y="46" class="t num" font-size="13" font-weight="600">9:40 pm</text>
+          <text x="126" y="30" class="t t-soft" font-size="8.5">Zhengzhou</text><text x="126" y="46" class="t num" font-size="13" font-weight="600">4:40 pm</text>
+          <text x="16" y="80" class="t num live-svg" font-size="11" font-weight="600">50.03%</text><text x="60" y="80" class="t t-soft" font-size="10">of my life in Aotearoa</text>
+          <g font-size="9.5" class="t"><text x="16" y="110">GitHub</text><text x="60" y="110">LinkedIn</text><text x="110" y="110">Email</text><text x="146" y="110">Resume</text></g>
+          <line x1="16" y1="126" x2="304" y2="126" class="s-grid"/>
+          <text x="16" y="148" class="t t-soft" font-size="9">© 2026 Frank Fu, </text><text x="88" y="148" class="t t-han t-soft" font-size="9">付优扬</text>
+          <text x="304" y="148" text-anchor="end" class="t t-soft" font-size="9">Built with Next.js</text>
+        </svg>
+      </figure>
+      <p class="small soft">Live clocks for both cities, the live life split, links, and both your names.</p>
+    </article>
+    <article class="chapter" id="ch-404">
+      <header class="ch-head"><h3>404</h3><span class="phase">Phase 1 plain, 5 game</span></header>
+      <figure class="screen">
+        <svg viewBox="0 0 320 170" role="img" aria-label="Wireframe of the 404 page: the characters 不中 in squares, a short message and two buttons">
+          <text x="160" y="84" text-anchor="middle" class="t t-han t-sq" font-size="72">不中</text>
+          <text x="160" y="110" text-anchor="middle" class="t t-soft" font-size="10">That page doesn't exist.</text>
+          <rect x="88" y="124" width="66" height="22" rx="2" class="f-ink"/><text x="98" y="139" class="t t-paper" font-size="9.5">Back home</text>
+          <rect x="160" y="124" width="72" height="22" rx="2" class="f-none s-line"/><text x="168" y="139" class="t" font-size="9.5">Play a rally</text>
+        </svg>
+      </figure>
+      <p class="small soft"><span class="han">不中</span> is how Henan people say "no good". The rally game arrives in phase 5.</p>
+    </article>
+    <article class="chapter" id="ch-resume">
+      <header class="ch-head"><h3>Resume page</h3><span class="phase">Phase 1</span></header>
+      <figure class="screen">
+        <svg viewBox="0 0 320 170" role="img" aria-label="Wireframe of the resume page: name, contact line, sections with text lines and a download button">
+          <text x="16" y="34" class="t" font-size="15" font-weight="600">Frank Fu</text>
+          <text x="16" y="50" class="t t-soft" font-size="9">Youyang Fu, 付优扬. Auckland, New Zealand</text>
+          <rect x="218" y="20" width="86" height="22" rx="2" class="f-ink"/><text x="228" y="35" class="t t-paper" font-size="9">Download PDF</text>
+          <g font-size="9" class="t t-soft"><text x="16" y="76">Education</text><text x="16" y="112">Experience</text><text x="16" y="148">Projects</text></g>
+          <g class="f-grid">
+            <rect x="96" y="70" width="180" height="6"/><rect x="96" y="82" width="140" height="6"/>
+            <rect x="96" y="106" width="200" height="6"/><rect x="96" y="118" width="160" height="6"/>
+            <rect x="96" y="142" width="190" height="6"/><rect x="96" y="154" width="120" height="6"/>
+          </g>
+        </svg>
+      </figure>
+      <p class="small soft">The CV as one plain page that's quick to read and easy to print. It's also where search engines find "Youyang Fu".</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ design system ============ -->
+<section id="system">
+  <div class="sec-head">
+    <h2>Design system</h2>
+    <p>The shared rules every section is built from. Changing a token here changes it everywhere.</p>
+  </div>
+  <div class="sys-grid">
+    <div class="sys-block" style="grid-column: 1 / -1">
+      <h3>Colour</h3>
+      <p>Paper and ink carry almost everything. Cinnabar, the colour of seal paste, is the only accent: the seal, the wet tip of a stroke, and "up" in the Zhengzhou years. Jade appears only in the chart. Now mode blends between the two sets by the sun over Auckland.</p>
+      <div class="swatches">
+        <div class="sw-row">
+          <span class="rowname">Light</span>
+          <span class="sw"><b style="background:#EDEFEC"></b><span>Paper #EDEFEC</span></span>
+          <span class="sw"><b style="background:#1B1E24"></b><span>Ink #1B1E24</span></span>
+          <span class="sw"><b style="background:#69707A"></b><span>Soft #69707A</span></span>
+          <span class="sw"><b style="background:#C3C8C8"></b><span>Grid #C3C8C8</span></span>
+          <span class="sw"><b style="background:#A7ADB1"></b><span>Line #A7ADB1</span></span>
+          <span class="sw"><b style="background:#C23B22"></b><span>Cinnabar #C23B22</span></span>
+          <span class="sw"><b style="background:#2B7A5F"></b><span>Jade #2B7A5F</span></span>
+        </div>
+        <div class="sw-row">
+          <span class="rowname">Dark</span>
+          <span class="sw"><b style="background:#13161B"></b><span>Paper #13161B</span></span>
+          <span class="sw"><b style="background:#E7E9E4"></b><span>Ink #E7E9E4</span></span>
+          <span class="sw"><b style="background:#8C929B"></b><span>Soft #8C929B</span></span>
+          <span class="sw"><b style="background:#2C313A"></b><span>Grid #2C313A</span></span>
+          <span class="sw"><b style="background:#454C57"></b><span>Line #454C57</span></span>
+          <span class="sw"><b style="background:#E0563D"></b><span>Cinnabar #E0563D</span></span>
+          <span class="sw"><b style="background:#4FB08B"></b><span>Jade #4FB08B</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sys-block">
+      <h3>Chart colours</h3>
+      <p>The colour for "up" flips at the move, the same way the convention flips between Chinese and Western markets.</p>
+      <svg viewBox="0 0 300 120" role="img" aria-label="Two mini charts. Zhengzhou years on ZCE: red candles rise, green fall. Auckland years on NZX: green candles rise, red fall." style="width:100%;height:auto">
+        <text x="0" y="14" class="t" font-size="11" font-weight="600">ZCE, 2006 to 2016</text>
+        <text x="0" y="28" class="t t-soft" font-size="10">Red rises</text>
+        <line x1="20" y1="44" x2="20" y2="100" class="s-red"/><rect x="12" y="52" width="16" height="36" class="f-red"/>
+        <line x1="50" y1="60" x2="50" y2="108" class="s-jade"/><rect x="42" y="66" width="16" height="30" class="f-jade"/>
+        <text x="72" y="62" class="t t-soft" font-size="9">up</text><text x="72" y="96" class="t t-soft" font-size="9">down</text>
+        <line x1="148" y1="10" x2="148" y2="112" class="s-red dash"/>
+        <text x="160" y="14" class="t" font-size="11" font-weight="600">NZX, 2016 on</text>
+        <text x="160" y="28" class="t t-soft" font-size="10">Green rises</text>
+        <line x1="180" y1="44" x2="180" y2="100" class="s-jade"/><rect x="172" y="52" width="16" height="36" class="f-jade"/>
+        <line x1="210" y1="60" x2="210" y2="108" class="s-red"/><rect x="202" y="66" width="16" height="30" class="f-red"/>
+        <text x="232" y="62" class="t t-soft" font-size="9">up</text><text x="232" y="96" class="t t-soft" font-size="9">down</text>
+      </svg>
+    </div>
+
+    <div class="sys-block">
+      <h3>Type</h3>
+      <p>Instrument Sans for all Latin text, set tight at large sizes. LXGW WenKai for Chinese: a Kai face that matches the brush strokes of the opening, loaded only for the characters the site uses. Numbers use tabular figures wherever they line up.</p>
+      <div class="specimen" aria-label="Type scale">
+        <div><span class="sz">76</span><span class="smp" style="font-size:44px;font-weight:600;letter-spacing:-0.03em">Frank Fu</span></div>
+        <div><span class="sz">52</span><span class="smp" style="font-size:34px;font-weight:600;letter-spacing:-0.02em">Two homes</span></div>
+        <div><span class="sz">36</span><span class="smp" style="font-size:28px;font-weight:600">The chart</span></div>
+        <div><span class="sz">26</span><span class="smp" style="font-size:22px;font-weight:500">Let's connect</span></div>
+        <div><span class="sz">17 body</span><span class="smp" style="font-size:17px">Born in Zhengzhou, raised in Auckland.</span></div>
+        <div><span class="sz">14</span><span class="smp" style="font-size:14px;color:var(--ink-soft)">Auckland 9:40 pm</span></div>
+        <div><span class="sz">Chinese</span><span class="smp han" style="font-size:30px">付优扬 郑州 壹贰叁</span></div>
+      </div>
+      <p class="tiny soft">Sizes in pixels on desktop. The samples here are scaled down to fit.</p>
+    </div>
+
+    <div class="sys-block">
+      <h3>Layout</h3>
+      <p>12 columns with 24px gutters (16px on phones) and a 1440px maximum width. Every size snaps to an 8px lattice, the same lattice the squares sit on. Running text is left-aligned and stays under about 68 characters. The name and the set pieces are centred.</p>
+      <svg viewBox="0 0 300 120" role="img" aria-label="A 12-column grid laid over a square lattice" style="width:100%;height:auto">
+        <rect x="0" y="0" width="300" height="120" fill="url(#lat)"/>
+        <g class="f-red" opacity=".12">
+          <rect x="6" y="0" width="18" height="120"/><rect x="30" y="0" width="18" height="120"/><rect x="54" y="0" width="18" height="120"/><rect x="78" y="0" width="18" height="120"/>
+          <rect x="102" y="0" width="18" height="120"/><rect x="126" y="0" width="18" height="120"/><rect x="150" y="0" width="18" height="120"/><rect x="174" y="0" width="18" height="120"/>
+          <rect x="198" y="0" width="18" height="120"/><rect x="222" y="0" width="18" height="120"/><rect x="246" y="0" width="18" height="120"/><rect x="270" y="0" width="18" height="120"/>
+        </g>
+        <rect x="6" y="24" width="138" height="10" class="f-ink"/><rect x="6" y="42" width="114" height="5" class="f-soft"/><rect x="6" y="52" width="126" height="5" class="f-soft"/><rect x="6" y="62" width="96" height="5" class="f-soft"/>
+        <rect x="174" y="24" width="114" height="72" fill="url(#sqs)" opacity=".5"/>
+      </svg>
+    </div>
+
+    <div class="sys-block" style="grid-column: 1 / -1">
+      <h3>Motion</h3>
+      <p>Four easing curves and a handful of durations, used everywhere. Consistent timing is what makes motion feel expensive. Scroll scenes don't have a duration: your scrolling drives them.</p>
+      <div class="curves">
+        <div class="curve"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 92 C 52 92, 36 8, 92 8" class="f-none s-red" stroke-width="2"/></svg><strong>Brush</strong><span class="soft tiny">Writing strokes</span><code>.55, 0, .35, 1</code></div>
+        <div class="curve"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 92 C 66.8 92, 24.8 8, 92 8" class="f-none s-red" stroke-width="2"/></svg><strong>Flight</strong><span class="soft tiny">Squares leaving and landing, 720ms</span><code>.7, 0, .2, 1</code></div>
+        <div class="curve"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 92 C 24.8 24.8, 24.8 8, 92 8" class="f-none s-red" stroke-width="2"/></svg><strong>Settle</strong><span class="soft tiny">Interface responses, 320ms</span><code>.2, .8, .2, 1</code></div>
+        <div class="curve"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 92 C 21.4 8, 33.2 8, 92 8" class="f-none s-red" stroke-width="2"/></svg><strong>Out</strong><span class="soft tiny">Reveals, 600ms</span><code>.16, 1, .3, 1</code></div>
+      </div>
+      <p class="tiny soft">Hover feedback takes 160ms. Anything the visitor touches answers within 100ms. With reduced motion turned on, scenes become still frames and transitions become quick fades.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ build ============ -->
+<section id="build">
+  <div class="sec-head">
+    <h2>Build plan</h2>
+    <p>Phase 1 builds the whole frame and style with every chapter in place, so content and set pieces can be added later without restructuring anything.</p>
+  </div>
+  <div class="build-grid">
+    <div style="display:grid;gap:28px;min-width:0">
+      <div style="display:grid;gap:12px">
+        <h3>Phases</h3>
+        <ol class="phases">
+          <li class="now">
+            <h3>Foundation</h3>
+            <ul>
+              <li>Design tokens, fonts, Light / Dark / Now with no flash on load</li>
+              <li>Header, phone menu, footer with live clocks, smooth scrolling, square-wipe transitions</li>
+              <li>Squares engine and the opening, ported from the prototype, with the short repeat-visit version</li>
+              <li>All six chapters at their real layout, reading placeholder data from content files; a static chart with hover</li>
+              <li>Contact form working end to end</li>
+              <li>Case study template with one sample, resume page, plain 404</li>
+              <li>Search and sharing: titles with all three names, a share image, seal favicon, sitemap</li>
+              <li>Deployed to Vercel with a preview link for every change</li>
+            </ul>
+          </li>
+          <li><h3>Set pieces</h3><p>The Two homes scroll scene, the full chart scene with ticker and live candle, the Hold'em progress corner, character breakdowns, your name's audio.</p></li>
+          <li><h3>Real content</h3><p>Projects and case studies, school and internships on the chart, the Stack data, the resume PDF.</p></li>
+          <li><h3>Off the clock</h3><p>The cube-built avatar with gear hotspots, the smash meter, the Table and the Arcade.</p></li>
+          <li><h3>Delight and polish</h3><p>Hidden cards around the site, the 404 rally game, sound, a performance pass, analytics.</p></li>
+        </ol>
+      </div>
+      <div style="display:grid;gap:12px">
+        <h3>Quality bar</h3>
+        <ul class="checks">
+          <li>Phone Lighthouse scores: performance 90 or more, accessibility 100</li>
+          <li>Useful first view within 2.5 seconds on 4G; the opening plays while the rest loads</li>
+          <li>60 frames per second on a mid-range laptop; the squares engine uses fewer squares on weaker devices</li>
+          <li>Everything reachable by keyboard and screen reader; reduced motion gives still frames</li>
+          <li>No layout shift and no flash of the wrong colours</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:grid;gap:28px;min-width:0">
+      <div style="display:grid;gap:12px">
+        <h3>Tools</h3>
+        <ul class="stack-list">
+          <li><span>Framework</span><span>Next.js 16, React 19, TypeScript. Already set up in the repo.</span></li>
+          <li><span>Styling</span><span>Tailwind CSS 4, with the tokens above as CSS variables</span></li>
+          <li><span>Motion</span><span>GSAP with ScrollTrigger for scroll scenes, Lenis for smooth scrolling, Motion for small interface animations. All three are already installed.</span></li>
+          <li><span>Squares and 3D</span><span>three.js, one canvas for the whole site (to add)</span></li>
+          <li><span>Content</span><span>Typed files in <code>content/</code>; case studies in MDX</span></li>
+          <li><span>Email</span><span>Resend through a server action (to add)</span></li>
+          <li><span>Hosting</span><span>Vercel</span></li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:12px;min-width:0">
+        <h3>Where things live</h3>
+<pre><code>app/
+  layout.tsx          fonts, colour mode, header, footer, squares canvas
+  page.tsx            opening + six chapters
+  work/[slug]/        case studies
+  resume/             plain CV
+  play/[room]/        phase 4
+  not-found.tsx       不中
+components/
+  shell/              Header, Menu, Footer, ModeSwitch, PageWipe
+  squares/            engine and shapes (name, map, chart, 不中)
+  chapters/           Opening, TwoHomes, Chart, Work, Stack,
+                      OffTheClock, Connect
+  ui/                 Button, Chip, Field, Plaque, Card
+content/              site, timeline, projects/*.mdx, stack,
+                      gear, games, facts
+lib/                  motion tokens, sun position, time zones,
+                      stroke data
+public/               resume.pdf, share image, name audio</code></pre>
+        <p class="tiny soft">Adding a project, a chapter on the chart or a new tool means editing one file in <code>content/</code>. No layout code changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ needs ============ -->
+<section id="needs">
+  <div class="sec-head">
+    <h2>What I need from you</h2>
+    <p>Phase 1 can start with only the first list. Everything else shows as a placeholder until you send it.</p>
+  </div>
+  <div class="needs-grid">
+    <div>
+      <h3>Before phase 1</h3>
+      <ul class="checks">
+        <li class="done">The intro line: BE (Hons), Software Engineering, University of Auckland</li>
+        <li class="done">Where contact messages go: received and kept out of the code</li>
+        <li class="done">Domain: youyangfu.com</li>
+        <li>GitHub and LinkedIn links (placeholders until you send them with your resume)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Later</h3>
+      <ul class="checks">
+        <li>Projects, internships and education details</li>
+        <li>Life chapters for the chart, each with a best and a hardest moment</li>
+        <li>Your tools and roughly how long you've used each</li>
+        <li>Gear list, the games you play, your favourite starting hand</li>
+        <li>Face photo, name recording, resume PDF</li>
+        <li>The day you arrived in July 2016 (a passport stamp or school enrolment record would show it)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Decisions to confirm</h3>
+      <ul class="checks">
+        <li>Chapter numerals <span class="han">壹 贰 叁</span>: keep them?</li>
+        <li>Menu labels: Work, About, Play, Contact, Resume</li>
+        <li>Chart codes: FYY0603 on ZCE (product code plus birth year and month, the way ZCE names its contracts) and FRK on NZX</li>
+        <li>The Hold'em corner as the progress indicator: keep it?</li>
+        <li>Publish your exact birth date, or only March 2006?</li>
+        <li>Where you bought youyangfu.com, so we can point it at Vercel and verify it for email</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(() => {
+  const born = Date.UTC(2006, 2, 27);
+  const arrived = Date.UTC(2016, 6, 15); // mid-July assumed until the exact day is known
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const html = document.getElementById("livePct");
+  const svgs = document.querySelectorAll(".live-svg");
+  function tick() {
+    const now = Date.now();
+    const pct = (100 * (now - arrived)) / (now - born);
+    if (html) html.textContent = pct.toFixed(reduce ? 2 : 6) + "%";
+    svgs.forEach(el => { el.textContent = pct.toFixed(2) + "%"; });
+  }
+  tick();
+  setInterval(tick, reduce ? 60000 : 120);
+})();
+</script>
+</body></html>

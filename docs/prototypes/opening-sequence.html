@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Reference implementation of the opening sequence (prototype 1, flight 720ms). Port this logic into the squares engine; see docs/blueprint.md. Stroke data: hanzi-writer-data@2.0.1 / Make Me a Hanzi (Arphic Public License). -->
+</head><body style="margin:0">
+<title>付优扬 Opening Sequence</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one still stage of rice-paper ground; the name is built from squares on a single shared lattice; controls sit quietly on the bottom edge */
+:root {
+  --paper: #EDEFEC;      /* cool rice paper */
+  --ink: #1B1E24;        /* 墨, blue-black ink */
+  --ink-soft: #69707A;
+  --grid: #C3C8C8;       /* 米字格 practice-grid lines */
+  --line: #A7ADB1;
+  --cinnabar: #C23B22;   /* 朱砂, seal paste */
+  --font-ui: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13161B; --ink: #E7E9E4; --ink-soft: #8C929B; --grid: #2C313A; --line: #454C57; --cinnabar: #E0563D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13161B; --ink: #E7E9E4; --ink-soft: #8C929B; --grid: #2C313A; --line: #454C57; --cinnabar: #E0563D;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  overflow: hidden;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  -webkit-font-smoothing: antialiased;
+}
+#stage { position: fixed; inset: 0; display: block; touch-action: manipulation; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.hit {
+  position: fixed; left: 0; top: 0; width: 0; height: 0;
+  background: transparent; border: 0; padding: 0; margin: 0;
+  cursor: pointer; border-radius: 2px;
+}
+.hit[disabled] { pointer-events: none; }
+.hit:focus-visible { outline: 1.5px dashed var(--cinnabar); outline-offset: 6px; }
+
+.tip {
+  position: fixed; left: 0; top: 0;
+  max-width: 15rem;
+  font-size: 12.5px; line-height: 1.45; color: var(--ink-soft);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .25s cubic-bezier(.2,.8,.2,1), transform .25s cubic-bezier(.2,.8,.2,1);
+  pointer-events: none;
+}
+.tip strong { color: var(--ink); font-weight: 500; }
+.seal-hit:hover + .tip, .seal-hit:focus-visible + .tip { opacity: 1; transform: none; }
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: 12px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: 12px 32px;
+  font-size: 13px; line-height: 1.45; color: var(--ink-soft);
+  pointer-events: none;
+}
+.bar > * { pointer-events: auto; min-width: 0; }
+.about { display: grid; gap: 2px; max-width: 34rem; }
+.about p { margin: 0; }
+.about .name { color: var(--ink); font-weight: 500; }
+.about .credit { font-size: 12px; }
+.controls { display: grid; gap: 8px; justify-items: end; }
+.now { margin: 0; display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.ctl {
+  font: 500 13px/1 var(--font-ui);
+  color: var(--ink); background: transparent;
+  border: 1px solid var(--line); border-radius: 2px;
+  padding: 8px 12px; cursor: pointer;
+}
+.ctl:hover { border-color: var(--ink); }
+.ctl[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ctl:focus-visible { outline: 1.5px solid var(--cinnabar); outline-offset: 2px; }
+.seg { display: inline-flex; }
+.seg .ctl + .ctl { margin-left: -1px; }
+.seg .ctl[aria-pressed="true"] { position: relative; z-index: 1; }
+@media (max-width: 560px) {
+  .controls { justify-items: start; }
+  .row, .now { justify-content: flex-start; }
+}
+</style>
+
+<h1 class="sr">Frank Fu, 付优扬 (Fù Yōuyáng)</h1>
+<canvas id="stage" aria-hidden="true"></canvas>
+<button id="nameHit" class="hit" type="button" disabled aria-label="Switch the name between 付优扬 and Frank Fu"></button>
+<button id="sealHit" class="hit seal-hit" type="button" disabled aria-describedby="sealTip"><span class="sr">Name seal</span></button>
+<div id="sealTip" class="tip" role="tooltip"><strong>Name seal, 付优扬印.</strong> Read the right column first, top to bottom: 付 优, then 扬 印. 印 means seal.</div>
+
+<div class="bar">
+  <div class="about">
+    <p class="name">Opening sequence, prototype 1</p>
+    <p>Hover or tap the name to switch between 付优扬 and Frank Fu.</p>
+    <p class="credit">Stroke data from Make Me a Hanzi (Arphic Public License).</p>
+  </div>
+  <div class="controls">
+    <p class="now" id="nowLine" hidden><span id="aklTime"></span><span id="zzTime"></span></p>
+    <div class="row">
+      <button id="replay" class="ctl" type="button">Replay</button>
+      <button id="slow" class="ctl" type="button" aria-pressed="false">Slow motion</button>
+      <div class="seg" role="group" aria-label="Colour mode">
+        <button class="ctl" type="button" data-mode="light" aria-pressed="false">Light</button>
+        <button class="ctl" type="button" data-mode="dark" aria-pressed="false">Dark</button>
+        <button class="ctl" type="button" data-mode="now" aria-pressed="false">Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const GLYPHS = {"fu":{"strokes":["M 291 535 Q 420 740 421 745 Q 420 751 419 755 Q 415 770 380 795 Q 349 816 327 815 Q 305 812 315 787 Q 333 750 319 717 Q 243 525 59 300 Q 47 287 45 280 Q 41 267 58 271 Q 106 283 264 495 L 291 535 Z","M 264 495 Q 295 431 271 245 Q 264 193 249 139 Q 234 90 271 42 Q 272 39 276 36 Q 295 20 307 48 Q 322 90 322 138 Q 328 391 338 449 Q 345 477 335 488 Q 317 510 303 524 Q 297 531 291 535 C 269 555 253 523 264 495 Z","M 758 482 Q 819 488 897 489 Q 957 486 964 499 Q 970 511 952 525 Q 892 567 828 547 Q 797 541 758 532 L 699 520 Q 675 517 651 512 Q 534 493 396 471 Q 374 468 391 451 Q 425 423 464 432 Q 575 465 699 476 L 758 482 Z","M 699 476 Q 699 338 699 121 Q 698 96 685 87 Q 678 84 602 101 Q 565 116 567 104 Q 568 95 591 78 Q 663 17 680 -17 Q 701 -57 719 -58 Q 735 -59 753 -19 Q 775 33 773 120 Q 758 301 758 482 L 758 532 Q 752 667 778 757 Q 797 793 732 818 Q 693 839 671 830 Q 650 823 669 796 Q 694 765 696 725 Q 697 706 699 520 L 699 476 Z","M 468 344 Q 504 275 535 253 Q 550 246 563 258 Q 573 270 574 288 Q 573 313 557 332 Q 527 362 482 385 Q 470 389 463 388 Q 456 388 456 375 Q 455 362 468 344 Z"],"medians":[[[328,798],[347,783],[370,746],[327,651],[277,561],[195,440],[98,320],[55,280]],[[290,528],[296,491],[308,463],[308,435],[299,243],[282,98],[288,45]],[[393,461],[453,455],[605,485],[854,520],[904,518],[954,505]],[[673,817],[698,803],[734,767],[726,585],[734,93],[725,62],[709,38],[574,103]],[[467,378],[528,312],[546,274]]]},"you":{"strokes":["M 243 494 Q 289 552 339 629 Q 367 681 394 705 Q 404 715 399 730 Q 395 743 365 768 Q 338 787 318 788 Q 299 787 307 763 Q 320 729 307 700 Q 267 606 204 517 Q 144 432 64 340 Q 54 330 50 323 Q 46 311 61 314 Q 101 318 219 464 L 243 494 Z","M 219 464 Q 240 407 240 354 Q 228 194 202 107 Q 192 62 226 11 Q 227 11 229 8 Q 247 -8 259 19 Q 274 59 273 106 Q 286 350 297 404 Q 304 431 295 442 Q 250 490 243 494 C 220 514 209 492 219 464 Z","M 577 465 Q 649 481 798 506 Q 808 505 818 518 Q 818 530 795 539 Q 768 560 687 534 Q 615 518 583 506 L 526 493 Q 403 475 371 469 Q 343 465 365 448 Q 401 424 438 433 Q 475 442 520 452 L 577 465 Z","M 520 452 Q 472 205 365 76 Q 346 54 320 27 Q 307 20 305 15 Q 301 8 318 9 Q 327 9 364 33 Q 389 49 431 92 Q 539 212 577 465 L 583 506 Q 586 638 623 730 Q 630 742 621 750 Q 569 802 526 792 Q 505 785 521 766 Q 549 733 547 702 Q 540 587 526 493 L 520 452 Z","M 943 70 Q 925 95 896 177 Q 893 193 885 198 Q 878 201 875 181 Q 857 90 842 60 Q 812 32 731 34 Q 698 35 674 45 Q 653 54 648 67 Q 620 133 663 340 Q 672 370 623 391 Q 610 395 602 391 Q 595 388 599 370 Q 611 331 606 294 Q 582 62 614 21 Q 632 3 677 -11 Q 813 -47 935 18 Q 936 21 940 21 Q 962 40 943 70 Z","M 729 677 Q 760 649 791 617 Q 804 604 820 603 Q 830 603 837 617 Q 841 632 834 661 Q 825 697 726 725 Q 710 729 704 727 Q 700 723 700 710 Q 703 700 729 677 Z"],"medians":[[[318,773],[335,757],[354,723],[311,638],[196,466],[95,351],[59,323]],[[241,487],[246,459],[267,418],[251,191],[237,103],[242,20]],[[366,459],[427,454],[704,516],[775,525],[807,520]],[[528,778],[569,752],[582,723],[549,459],[523,337],[477,209],[433,130],[350,37],[312,14]],[[609,382],[634,349],[617,189],[616,118],[625,58],[642,33],[691,12],[764,5],[833,15],[871,33],[894,53],[885,191]],[[709,721],[722,707],[791,664],[818,622]]]},"yang":{"strokes":["M 357 566 Q 427 587 433 593 Q 440 600 436 609 Q 429 619 399 625 Q 380 628 360 622 L 311 602 Q 230 572 142 557 Q 108 548 134 534 Q 180 513 229 530 Q 268 542 310 553 L 357 566 Z","M 305 372 Q 301 275 300 147 Q 299 125 286 115 Q 276 108 248 118 Q 217 127 188 135 Q 157 147 159 137 Q 160 130 180 116 Q 253 64 273 33 Q 297 -4 314 -4 Q 327 -5 342 28 Q 358 71 358 142 Q 351 275 352 407 L 353 437 Q 353 501 357 566 L 360 622 Q 360 697 380 762 Q 396 790 344 813 Q 313 832 293 825 Q 277 819 291 797 Q 312 772 312 738 Q 313 722 311 602 L 310 553 Q 309 493 306 411 L 305 372 Z","M 306 411 Q 74 284 67 280 Q 49 280 46 264 Q 45 254 59 240 Q 78 224 102 216 Q 118 212 128 224 Q 197 293 305 372 L 352 407 Q 358 413 366 417 Q 387 430 396 444 Q 403 457 392 457 Q 367 451 353 437 L 306 411 Z","M 737 91 Q 721 70 705 73 Q 678 80 640 89 Q 624 93 623 90 Q 623 86 640 70 Q 674 36 692 -4 Q 702 -20 712 -24 Q 719 -27 739 -11 Q 796 35 833 111 Q 872 192 912 415 Q 918 440 931 453 Q 944 463 931 480 Q 916 495 887 513 Q 865 526 791 507 Q 787 507 784 506 Q 675 482 596 472 Q 584 463 578 474 Q 578 490 666 617 Q 711 677 731 684 Q 744 691 744 698 Q 745 705 739 710 Q 717 731 688 741 Q 669 750 638 735 Q 527 696 454 695 Q 439 695 436 690 Q 435 686 440 677 Q 447 667 462 658 Q 474 649 529 663 Q 655 700 659 690 Q 659 666 572 532 Q 568 529 566 524 Q 547 496 520 470 Q 501 458 516 422 Q 519 412 546 422 Q 553 425 563 427 L 597 436 Q 631 448 680 457 L 728 465 Q 791 478 824 478 Q 845 477 847 467 Q 865 374 799 198 Q 765 123 737 91 Z","M 563 427 Q 569 355 428 206 Q 418 200 417 191 Q 416 187 421 187 Q 496 203 595 354 Q 608 376 618 387 Q 624 396 618 408 Q 608 427 597 436 C 576 457 563 457 563 427 Z","M 680 457 Q 707 325 452 55 Q 445 49 455 48 Q 512 57 624 193 Q 697 310 737 384 Q 744 405 758 421 Q 765 427 762 436 Q 755 457 728 465 C 700 477 676 487 680 457 Z"],"medians":[[[135,546],[201,546],[372,598],[425,603]],[[300,810],[325,795],[345,764],[329,437],[329,134],[322,103],[304,71],[279,78],[195,118],[176,134],[165,135]],[[63,262],[106,257],[386,448]],[[443,685],[484,675],[537,683],[665,717],[693,701],[646,614],[559,484],[551,457],[587,451],[823,497],[853,495],[871,486],[888,463],[872,347],[842,228],[812,146],[775,81],[749,49],[722,31],[646,80],[626,87]],[[570,423],[590,399],[549,322],[486,244],[423,193]],[[687,453],[718,427],[717,420],[694,356],[651,274],[601,196],[559,145],[510,95],[473,64],[462,63],[458,54]]]},"yin":{"strokes":["M 257 630 Q 315 658 352 679 Q 443 733 469 740 Q 494 749 485 770 Q 472 792 444 812 Q 419 831 404 830 Q 388 830 392 814 Q 393 780 314 710 Q 280 682 245 650 C 223 630 230 617 257 630 Z","M 253 526 Q 249 578 256 619 Q 257 625 257 630 C 258 641 258 641 245 650 Q 220 669 199 679 Q 180 686 170 680 Q 158 673 169 657 Q 215 566 197 361 Q 194 309 151 256 Q 138 240 146 215 Q 156 187 170 174 Q 183 165 197 183 Q 222 220 429 359 Q 450 372 456 381 Q 460 391 450 392 Q 432 392 266 309 Q 247 300 247 318 Q 254 418 253 500 L 253 526 Z","M 253 500 Q 292 488 378 510 Q 462 534 470 539 Q 477 548 472 556 Q 465 568 434 572 Q 403 576 373 561 Q 316 539 254 527 Q 253 527 253 526 C 224 517 224 507 253 500 Z","M 623 588 Q 669 609 774 635 Q 784 638 793 633 Q 812 624 812 593 Q 811 515 783 378 Q 782 350 755 353 Q 721 359 692 364 Q 674 367 679 357 Q 680 345 711 322 Q 751 288 774 249 Q 787 236 801 243 Q 811 247 830 284 Q 861 341 862 405 Q 865 588 885 617 Q 898 627 893 641 Q 883 654 843 682 Q 825 694 778 679 Q 744 676 654 647 Q 618 638 591 632 C 562 625 595 577 623 588 Z","M 556 -35 Q 562 -63 569 -73 Q 575 -80 583 -78 Q 599 -69 606 -4 Q 615 78 612 161 Q 609 231 613 500 Q 613 548 623 588 C 628 613 618 618 591 632 Q 570 644 559 646 Q 546 650 528 641 Q 518 632 527 621 Q 531 611 538 601 Q 551 576 553 541 Q 556 393 551 159 Q 550 14 556 -35 Z"],"medians":[[[402,819],[420,792],[425,770],[367,719],[263,648],[262,640]],[[178,668],[202,648],[221,616],[228,465],[219,270],[247,272],[279,286],[449,384]],[[260,507],[413,547],[464,547]],[[598,628],[631,617],[748,652],[796,658],[825,652],[846,630],[825,399],[809,334],[790,310],[688,356]],[[536,631],[562,616],[584,580],[579,-68]]]}};
+
+const NAME_KEYS = ["fu", "you", "yang"];
+const SEAL_GRID = [["yang", "fu"], ["yin", "you"]]; // top row [left, right], bottom row [left, right]
+const PINYIN = [
+  { text: "fù",   chao: [5, 1] },  // 4th tone, falling
+  { text: "yōu",  chao: [5, 5] },  // 1st tone, high and level
+  { text: "yáng", chao: [3, 5] },  // 2nd tone, rising
+];
+const LATIN = "Frank Fu";
+const AKL = { lat: -36.8485, lon: 174.7633 };
+const UI_FONT = '"Instrument Sans", "Helvetica Neue", Arial, sans-serif';
+
+const root = document.documentElement;
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d");
+const probe = document.createElement("canvas").getContext("2d");
+const nameHit = document.getElementById("nameHit");
+const sealHit = document.getElementById("sealHit");
+const sealTip = document.getElementById("sealTip");
+const bar = document.querySelector(".bar");
+const reduceMQ = matchMedia("(prefers-reduced-motion: reduce)");
+
+/* ---------- motion tokens ---------- */
+function cubicBezier(x1, y1, x2, y2) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const sx = t => ((ax * t + bx) * t + cx) * t;
+  const sy = t => ((ay * t + by) * t + cy) * t;
+  return x => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let lo = 0, hi = 1, t = x;
+    for (let i = 0; i < 18; i++) {
+      if (sx(t) < x) lo = t; else hi = t;
+      t = (lo + hi) / 2;
+    }
+    return sy(t);
+  };
+}
+const EASE = {
+  brush:  cubicBezier(.55, 0, .35, 1),   // press, travel, lift
+  flight: cubicBezier(.7, 0, .2, 1),     // squares leaving and landing
+  settle: cubicBezier(.2, .8, .2, 1),
+  out:    cubicBezier(.16, 1, .3, 1),
+};
+const backOut = x => { const s = 2.2; x -= 1; return x * x * ((s + 1) * x + s) + 1; };
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+function invert(fn, y) { let lo = 0, hi = 1; for (let i = 0; i < 20; i++) { const m = (lo + hi) / 2; if (fn(m) < y) lo = m; else hi = m; } return (lo + hi) / 2; }
+function rng(seed) {
+  return () => {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- glyph prep (size independent) ---------- */
+const glyphs = {};
+for (const key of Object.keys(GLYPHS)) {
+  const g = GLYPHS[key];
+  glyphs[key] = {
+    paths: g.strokes.map(s => new Path2D(s)),
+    medians: g.medians.map(pts => {
+      const cum = [0];
+      for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      return { pts, cum, len: cum[cum.length - 1] || 1 };
+    }),
+  };
+}
+
+/* ---------- timeline (ms at 1x) ---------- */
+const T_WRITE = 560;
+const schedule = {};
+let cursor = T_WRITE;
+NAME_KEYS.forEach((key, ci) => {
+  const pace = [1.12, 1.0, 0.92][ci];             // the hand loosens up as it writes
+  const meds = glyphs[key].medians;
+  meds.forEach((m, si) => {
+    const dur = (80 + m.len * 0.24) * pace;
+    schedule[ci + ":" + si] = { start: cursor, dur };
+    cursor += dur + (si < meds.length - 1 ? 55 : 0);
+  });
+  if (ci < NAME_KEYS.length - 1) cursor += 210;
+});
+const T_WRITE_END = cursor;
+const T_PINYIN = T_WRITE_END + 140;
+const T_MORPH = T_WRITE_END + 1150;
+const D_FLIGHT = 720;
+const SPREAD = 0.3;
+const D_MORPH = D_FLIGHT * (1 + SPREAD + 0.12);
+const T_STAMP = T_MORPH + D_MORPH + 120;
+const D_STAMP = 460;
+const T_IDLE = T_STAMP + D_STAMP + 80;
+const SCALE_IN = 300, WET = 520, NB = 8;
+
+/* ---------- state ---------- */
+let W = 0, H = 0, dpr = 1;
+let G = null;                 // layout
+let P = 0;                    // particle count
+let A = null;                 // particle arrays
+let T = 0, speed = 1, last = 0;
+let shape = "han", target = "han", morph = null, introMorphDone = false;
+let hNow = 1, hFrom = 1;
+let shock = null;
+let pointer = { x: -1e4, y: -1e4, active: false, s: 0 };
+let colors = {}, buckets = [];
+let sealCanvas = null;
+let lastPointerType = "mouse";
+let started = false;
+
+/* ---------- colour ---------- */
+function hexToRgb(h) {
+  h = h.trim();
+  if (h.startsWith("rgb")) { const m = h.match(/[\d.]+/g).map(Number); return m.slice(0, 3); }
+  h = h.replace("#", "");
+  if (h.length === 3) h = h.split("").map(x => x + x).join("");
+  const n = parseInt(h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const rgbToHex = c => "#" + c.map(v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, "0")).join("");
+const mix = (a, b, t) => { const x = hexToRgb(a), y = hexToRgb(b); return rgbToHex([lerp(x[0], y[0], t), lerp(x[1], y[1], t), lerp(x[2], y[2], t)]); };
+function luminance(hex) {
+  const c = hexToRgb(hex).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+const PAL = {
+  light: { paper: "#EDEFEC", ink: "#1B1E24", inkSoft: "#69707A", grid: "#C3C8C8", line: "#A7ADB1", cinnabar: "#C23B22" },
+  dark:  { paper: "#13161B", ink: "#E7E9E4", inkSoft: "#8C929B", grid: "#2C313A", line: "#454C57", cinnabar: "#E0563D" },
+};
+
+/* sun over Auckland (low-precision solar position, good to a fraction of a degree) */
+function sunElevation(date, lat, lon) {
+  const rad = Math.PI / 180;
+  const d = date.getTime() / 86400000 + 2440587.5 - 2451545.0;
+  const g = (357.529 + 0.98560028 * d) * rad;
+  const q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad;
+  const e = (23.439 - 0.00000036 * d) * rad;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+  const dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24;
+  const ha = (gmst * 15 + lon) * rad - ra;
+  return Math.asin(Math.sin(lat * rad) * Math.sin(dec) + Math.cos(lat * rad) * Math.cos(dec) * Math.cos(ha)) / rad;
+}
+function nowPalette(date) {
+  const el = sunElevation(date, AKL.lat, AKL.lon);
+  const t = smoothstep(-7, 3, el);
+  const glow = Math.exp(-Math.pow((el - 1) / 4.5, 2));
+  const dusk = el >= -2 ? "#E3B996" : "#46517C";
+  let paper = mix(PAL.dark.paper, PAL.light.paper, t);
+  paper = mix(paper, dusk, glow * (t > 0.5 ? 0.2 : 0.14));
+  const light = luminance(paper) > 0.28;
+  const base = light ? PAL.light : PAL.dark;
+  return {
+    el, light,
+    pal: {
+      paper, ink: base.ink, inkSoft: mix(paper, base.ink, light ? 0.62 : 0.6),
+      grid: mix(paper, base.ink, light ? 0.16 : 0.13), line: mix(paper, base.ink, 0.32), cinnabar: base.cinnabar,
+    },
+  };
+}
+
+let themeMode = "now";
+try { const m = localStorage.getItem("fu-proto-theme"); if (m === "light" || m === "dark" || m === "now") themeMode = m; } catch (e) {}
+const nowLine = document.getElementById("nowLine");
+const aklFmt = new Intl.DateTimeFormat("en-NZ", { timeZone: "Pacific/Auckland", hour: "numeric", minute: "2-digit" });
+const zzFmt = new Intl.DateTimeFormat("en-NZ", { timeZone: "Asia/Shanghai", hour: "numeric", minute: "2-digit" });
+
+function applyTheme() {
+  const props = ["paper", "ink", "ink-soft", "grid", "line", "cinnabar"];
+  if (themeMode === "now") {
+    const now = new Date();
+    const { el, light, pal } = nowPalette(now);
+    root.dataset.theme = light ? "light" : "dark";
+    root.style.setProperty("--paper", pal.paper);
+    root.style.setProperty("--ink", pal.ink);
+    root.style.setProperty("--ink-soft", pal.inkSoft);
+    root.style.setProperty("--grid", pal.grid);
+    root.style.setProperty("--line", pal.line);
+    root.style.setProperty("--cinnabar", pal.cinnabar);
+    const deg = Math.round(Math.abs(el));
+    const sun = el >= 0 ? `sun ${deg}° up` : `sun ${deg}° below the horizon`;
+    document.getElementById("aklTime").textContent = `Auckland ${aklFmt.format(now)}, ${sun}`;
+    document.getElementById("zzTime").textContent = `Zhengzhou ${zzFmt.format(now)}`;
+    nowLine.hidden = false;
+  } else {
+    props.forEach(p => root.style.removeProperty("--" + p));
+    root.dataset.theme = themeMode;
+    nowLine.hidden = true;
+  }
+  document.querySelectorAll(".seg .ctl").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === themeMode)));
+  readColors();
+}
+function readColors() {
+  const cs = getComputedStyle(root);
+  const v = n => cs.getPropertyValue(n).trim();
+  colors = { paper: v("--paper"), ink: v("--ink"), inkSoft: v("--ink-soft"), grid: v("--grid"), cinnabar: v("--cinnabar") };
+  buckets = [];
+  for (let b = 0; b < NB; b++) buckets.push(mix(colors.cinnabar, colors.ink, b / (NB - 1)));
+  if (G) sealCanvas = makeSeal(G.Z);
+}
+
+/* ---------- layout + cells ---------- */
+function computeLayout() {
+  W = window.innerWidth; H = window.innerHeight;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  canvas.style.width = W + "px"; canvas.style.height = H + "px";
+
+  const barH = bar.getBoundingClientRect().height;
+  const gutter = Math.max(24, W * 0.07);
+  const S = Math.max(64, Math.min(248, (H - barH) * 0.34, (W - 2 * gutter) / 3.75));
+  const gap = S * 0.14;
+  const c = Math.max(2.5, Math.round((S / 50) * dpr) / dpr);
+  const hanW = 3 * S + 2 * gap;
+  const Z = S * 0.27, sealGap = S * 0.13;
+  const groupW = hanW + sealGap + Z;
+  const left = (W - groupW) / 2;
+  const cy = (H - barH) / 2 + 4;
+  const hanTop = cy - S / 2 - S * 0.1;
+  const midY = hanTop + S / 2;
+
+  // Latin name, measured to match the width of the three characters
+  probe.font = `600 100px ${UI_FONT}`;
+  if ("letterSpacing" in probe) probe.letterSpacing = "-2px";
+  let m = probe.measureText(LATIN);
+  const w100 = (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || m.width);
+  const F = Math.min((100 * hanW * 0.98) / w100, S * 1.02);
+  const font = `600 ${F}px ${UI_FONT}`;
+  probe.font = font;
+  if ("letterSpacing" in probe) probe.letterSpacing = `${-0.02 * F}px`;
+  m = probe.measureText(LATIN);
+  const latBL = m.actualBoundingBoxLeft || 0;
+  const latW = latBL + (m.actualBoundingBoxRight || m.width);
+  const capM = probe.measureText("F");
+  const cap = capM.actualBoundingBoxAscent || F * 0.7;
+  const latLeft = left + (hanW - latW) / 2;
+  const baseline = midY + cap / 2;
+
+  G = {
+    S, gap, c, hanW, Z, sealGap, left, hanTop, midY, F, font, latLeft, latW, latBL, cap, baseline,
+    sealHan: { x: left + hanW + sealGap, y: hanTop + S - Z },
+    sealLat: { x: latLeft + latW + sealGap, y: baseline - Z },
+    hanRect: { x: left, y: hanTop, w: hanW, h: S },
+    latRect: { x: latLeft, y: baseline - cap, w: latW, h: cap },
+  };
+}
+
+function project(m, x, y) {
+  const p = m.pts;
+  if (p.length < 2) return { u: 0, d: Math.hypot(x - p[0][0], y - p[0][1]) };
+  let best = Infinity, bs = 0;
+  for (let i = 0; i < p.length - 1; i++) {
+    const ax = p[i][0], ay = p[i][1], vx = p[i + 1][0] - ax, vy = p[i + 1][1] - ay;
+    const l2 = vx * vx + vy * vy || 1;
+    const t = clamp(((x - ax) * vx + (y - ay) * vy) / l2);
+    const qx = ax + t * vx, qy = ay + t * vy;
+    const d = (x - qx) * (x - qx) + (y - qy) * (y - qy);
+    if (d < best) { best = d; bs = m.cum[i] + t * Math.sqrt(l2); }
+  }
+  return { u: bs / m.len, d: Math.sqrt(best) };
+}
+
+function buildHanCells() {
+  const { S, gap, c, left, hanTop } = G;
+  const sc = 1024 / S;
+  const out = [];
+  const rand = rng(1984);
+  NAME_KEYS.forEach((key, ci) => {
+    const g = glyphs[key];
+    const bx = left + ci * (S + gap), by = hanTop;
+    const i0 = Math.ceil(bx / c - 0.5), i1 = Math.floor((bx + S) / c - 0.5);
+    const j0 = Math.ceil(by / c - 0.5), j1 = Math.floor((by + S) / c - 0.5);
+    for (let j = j0; j <= j1; j++) {
+      for (let i = i0; i <= i1; i++) {
+        const x = (i + 0.5) * c, y = (j + 0.5) * c;
+        const dx = (x - bx) * sc, dy = 900 - (y - by) * sc;
+        for (let si = 0; si < g.paths.length; si++) {
+          if (probe.isPointInPath(g.paths[si], dx, dy)) {
+            const pr = project(g.medians[si], dx, dy);
+            const sch = schedule[ci + ":" + si];
+            const t = sch.start + invert(EASE.brush, pr.u) * sch.dur + pr.d * 0.2 + rand() * 12;
+            out.push({ x, y, t });
+            break;
+          }
+        }
+      }
+    }
+  });
+  return out;
+}
+
+function buildLatinCells() {
+  const { c, latLeft, latBL, baseline, cap, latW, font, F } = G;
+  const x0 = Math.floor(latLeft - c * 3), y0 = Math.floor(baseline - cap - c * 4);
+  const w = Math.ceil(latW + c * 6), h = Math.ceil(cap + c * 8);
+  const oc = document.createElement("canvas");
+  oc.width = w; oc.height = h;
+  const o = oc.getContext("2d");
+  o.font = font;
+  if ("letterSpacing" in o) o.letterSpacing = `${-0.02 * F}px`;
+  o.fillStyle = "#000";
+  o.textBaseline = "alphabetic";
+  o.fillText(LATIN, latLeft + latBL - x0, baseline - y0);
+  const data = o.getImageData(0, 0, w, h).data;
+  const at = (x, y) => {
+    const px = Math.round(x - x0), py = Math.round(y - y0);
+    if (px < 0 || py < 0 || px >= w || py >= h) return 0;
+    return data[(py * w + px) * 4 + 3] > 127 ? 1 : 0;
+  };
+  const out = [];
+  const i0 = Math.ceil(x0 / c - 0.5), i1 = Math.floor((x0 + w) / c - 0.5);
+  const j0 = Math.ceil(y0 / c - 0.5), j1 = Math.floor((y0 + h) / c - 0.5);
+  const q = c * 0.25;
+  for (let j = j0; j <= j1; j++) {
+    for (let i = i0; i <= i1; i++) {
+      const x = (i + 0.5) * c, y = (j + 0.5) * c;
+      const n = at(x - q, y - q) + at(x + q, y - q) + at(x - q, y + q) + at(x + q, y + q);
+      if (n >= 2) out.push({ x, y });
+    }
+  }
+  return out;
+}
+
+function buildParticles() {
+  const han = buildHanCells();
+  const lat = buildLatinCells();
+  const hs = han.map((_, i) => i).sort((a, b) => han[a].x - han[b].x || han[a].y - han[b].y);
+  const ls = lat.map((_, i) => i).sort((a, b) => lat[a].x - lat[b].x || lat[a].y - lat[b].y);
+  P = Math.max(han.length, lat.length);
+  const F32 = () => new Float32Array(P);
+  A = {
+    hx: F32(), hy: F32(), lx: F32(), ly: F32(), rev: F32(),
+    dupH: new Uint8Array(P), dupL: new Uint8Array(P),
+    fx: F32(), fy: F32(), fs: F32(), fa: F32(), ta: F32(),
+    cx: F32(), cy: F32(), cs: F32(), ca: F32(),
+    kx: F32(), ky: F32(), bump: F32(), delay: F32(), dir: F32(), r: F32(),
+  };
+  const rand = rng(2016);
+  let prevH = -1, prevL = -1;
+  for (let j = 0; j < P; j++) {
+    const hi = Math.floor((j * han.length) / P), li = Math.floor((j * lat.length) / P);
+    const hc = han[hs[hi]], lc = lat[ls[li]];
+    A.hx[j] = hc.x; A.hy[j] = hc.y; A.rev[j] = hc.t;
+    A.lx[j] = lc.x; A.ly[j] = lc.y;
+    A.dupH[j] = hi === prevH ? 1 : 0; A.dupL[j] = li === prevL ? 1 : 0;
+    prevH = hi; prevL = li;
+    A.dir[j] = rand() < 0.5 ? -1 : 1;
+    A.r[j] = rand();
+    A.bump[j] = 0.22 + 0.5 * rand();
+  }
+  restAt(shape);
+}
+
+function restAt(which) {
+  for (let j = 0; j < P; j++) {
+    A.cx[j] = which === "han" ? A.hx[j] : A.lx[j];
+    A.cy[j] = which === "han" ? A.hy[j] : A.ly[j];
+    A.cs[j] = 1; A.ca[j] = 0;
+  }
+}
+
+/* ---------- seal ---------- */
+function makeSeal(Z) {
+  const s = Math.max(8, Math.ceil(Z * dpr));
+  const oc = document.createElement("canvas");
+  oc.width = oc.height = s;
+  const o = oc.getContext("2d");
+  const r = rng(616);
+  const j = s * 0.012;
+  o.fillStyle = colors.cinnabar;
+  o.beginPath();
+  const n = 18;
+  for (let i = 0; i <= n; i++) o.lineTo((i / n) * s, j * r());
+  for (let i = 0; i <= n; i++) o.lineTo(s - j * r(), (i / n) * s);
+  for (let i = n; i >= 0; i--) o.lineTo((i / n) * s, s - j * r());
+  for (let i = n; i >= 0; i--) o.lineTo(j * r(), (i / n) * s);
+  o.closePath();
+  o.fill();
+
+  // carve the four characters out of the stone (白文)
+  o.globalCompositeOperation = "destination-out";
+  const pad = s * 0.09, gp = s * 0.035, q = (s - 2 * pad - gp) / 2;
+  const grow = 1.1;
+  const k = (q * grow) / 1024;
+  SEAL_GRID.forEach((rowKeys, ri) => rowKeys.forEach((key, ci) => {
+    const x = pad + ci * (q + gp) - (q * (grow - 1)) / 2;
+    const y = pad + ri * (q + gp) - (q * (grow - 1)) / 2;
+    o.setTransform(k, 0, 0, -k, x, y + 900 * k);
+    o.lineWidth = 34; o.lineJoin = "round";
+    for (const p of glyphs[key].paths) { o.fill(p); o.stroke(p); }
+  }));
+  o.setTransform(1, 0, 0, 1, 0, 0);
+
+  // uneven paste: small voids, heavier near the edges
+  const specks = Math.round(s * s * 0.004);
+  for (let i = 0; i < specks; i++) {
+    const edge = r() < 0.45;
+    let x = r() * s, y = r() * s;
+    if (edge) { const side = Math.floor(r() * 4); if (side === 0) y = r() * s * 0.06; else if (side === 1) x = s - r() * s * 0.06; else if (side === 2) y = s - r() * s * 0.06; else x = r() * s * 0.06; }
+    o.globalAlpha = 0.2 + 0.7 * r();
+    o.beginPath(); o.arc(x, y, (0.3 + r() * 1.1) * dpr * 0.7, 0, Math.PI * 2); o.fill();
+  }
+  o.globalAlpha = 1;
+  o.globalCompositeOperation = "source-over";
+  return oc;
+}
+
+/* ---------- morph ---------- */
+function hTarget(to) { return to === "han" ? 1 : 0; }
+function startMorph(to) {
+  if (target === to) return;
+  hFrom = hNow;
+  target = to;
+  if (reduceMQ.matches) {
+    morph = null; shape = to; hNow = hTarget(to); restAt(to);
+    return;
+  }
+  const { S, left, hanW } = G;
+  for (let j = 0; j < P; j++) {
+    const fx = A.cx[j], fy = A.cy[j];
+    const tx = to === "han" ? A.hx[j] : A.lx[j];
+    const ty = to === "han" ? A.hy[j] : A.ly[j];
+    A.fx[j] = fx; A.fy[j] = fy; A.fs[j] = A.cs[j]; A.fa[j] = A.ca[j];
+    A.ta[j] = Math.round((A.ca[j] + A.dir[j] * Math.PI / 2) / (Math.PI / 2)) * (Math.PI / 2);
+    const dist = Math.hypot(tx - fx, ty - fy);
+    const lift = Math.min(dist * 0.5 + S * 0.12, S * 0.75) * (0.55 + 0.45 * A.r[j]);
+    A.kx[j] = (fx + tx) / 2 + (A.r[(j * 7) % P] - 0.5) * S * 0.35;
+    A.ky[j] = (fy + ty) / 2 - lift;
+    A.delay[j] = SPREAD * D_FLIGHT * clamp((fx - left) / hanW) + A.r[(j * 13) % P] * 0.1 * D_FLIGHT;
+  }
+  morph = { start: T, to };
+}
+
+/* ---------- drawing ---------- */
+function drawGrid(p) {
+  if (p <= 0.002) return;
+  const { S, gap, left, hanTop } = G;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.strokeStyle = colors.grid;
+  ctx.lineWidth = 1;
+  for (let ci = 0; ci < 3; ci++) {
+    const bx = left + ci * (S + gap), by = hanTop;
+    const cx = bx + S / 2, cy = by + S / 2, hs = (S / 2) * p;
+    ctx.globalAlpha = 1;
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath();
+    ctx.moveTo(cx - hs, cy); ctx.lineTo(cx + hs, cy);
+    ctx.moveTo(cx, cy - hs); ctx.lineTo(cx, cy + hs);
+    ctx.moveTo(cx - hs, cy - hs); ctx.lineTo(cx + hs, cy + hs);
+    ctx.moveTo(cx + hs, cy - hs); ctx.lineTo(cx - hs, cy + hs);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = p;
+    ctx.strokeRect(bx + 0.5, by + 0.5, S - 1, S - 1);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawPinyin(alpha) {
+  if (alpha <= 0.002) return;
+  const { S, gap, left, hanTop } = G;
+  const fs = Math.max(12, Math.min(17, S * 0.075));
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.font = `500 ${fs}px ${UI_FONT}`;
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+  const y = hanTop + S + fs * 2.1;
+  PINYIN.forEach((p, i) => {
+    const a = alpha * EASE.out(clamp((T - T_PINYIN - i * 110) / 480));
+    if (a <= 0.002) return;
+    const cxm = left + i * (S + gap) + S / 2;
+    const tw = ctx.measureText(p.text).width;
+    const cw = fs * 1.15, ch = fs * 0.78, sp = fs * 0.5;
+    const x0 = cxm - (tw + sp + cw) / 2;
+    const rise = (1 - a) * 6;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = colors.inkSoft;
+    ctx.fillText(p.text, x0, y + rise);
+    // tone contour, Chao 1 to 5 scale, with the reference bar on its right
+    const top = y - fs * 0.74 + rise, bx = x0 + tw + sp;
+    const ly = lvl => top + ch * (5 - lvl) / 4;
+    ctx.strokeStyle = colors.grid;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(bx + cw + 3.5, top); ctx.lineTo(bx + cw + 3.5, top + ch); ctx.stroke();
+    const pr = EASE.settle(clamp((T - T_PINYIN - i * 110 - 160) / 520));
+    if (pr > 0) {
+      const xa = bx, ya = ly(p.chao[0]), xb = bx + cw, yb = ly(p.chao[1]);
+      ctx.strokeStyle = colors.inkSoft;
+      ctx.lineWidth = 1.5; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(xa, ya); ctx.lineTo(lerp(xa, xb, pr), lerp(ya, yb, pr)); ctx.stroke();
+      if (pr > 0.97) {
+        ctx.fillStyle = colors.cinnabar;
+        ctx.beginPath(); ctx.arc(xb, yb, 2, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  });
+  ctx.globalAlpha = 1;
+}
+
+function proximity(x, y) {
+  if (pointer.s <= 0.001) return 1;
+  const R = G.S * 0.6;
+  const dx = x - pointer.x, dy = y - pointer.y;
+  const d2 = dx * dx + dy * dy;
+  if (d2 >= R * R) return 1;
+  const k = 1 - Math.sqrt(d2) / R;
+  return 1 + 0.55 * k * k * pointer.s;
+}
+
+function drawParticles() {
+  const { c } = G;
+  const base = c * 0.8 * dpr;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  if (morph) {
+    ctx.fillStyle = colors.ink;
+    const el = T - morph.start;
+    for (let j = 0; j < P; j++) {
+      const e = clamp((el - A.delay[j]) / D_FLIGHT);
+      const ee = EASE.flight(e);
+      const tx = morph.to === "han" ? A.hx[j] : A.lx[j];
+      const ty = morph.to === "han" ? A.hy[j] : A.ly[j];
+      const u = 1 - ee;
+      const x = u * u * A.fx[j] + 2 * u * ee * A.kx[j] + ee * ee * tx;
+      const y = u * u * A.fy[j] + 2 * u * ee * A.ky[j] + ee * ee * ty;
+      const s = lerp(A.fs[j], 1, ee) + A.bump[j] * Math.sin(Math.PI * ee);
+      const a = lerp(A.fa[j], A.ta[j], ee);
+      A.cx[j] = x; A.cy[j] = y; A.cs[j] = s; A.ca[j] = a;
+      const size = base * s;
+      if (e <= 0 || e >= 1) {
+        const pk = proximity(x, y);
+        const sz = Math.round(size * pk);
+        ctx.fillRect(Math.round(x * dpr - sz / 2), Math.round(y * dpr - sz / 2), sz, sz);
+      } else {
+        const cs = Math.cos(a), sn = Math.sin(a);
+        ctx.setTransform(cs, sn, -sn, cs, x * dpr, y * dpr);
+        ctx.fillRect(-size / 2, -size / 2, size, size);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+    }
+    if (el >= D_MORPH) {
+      shape = morph.to; morph = null;
+      for (let j = 0; j < P; j++) { A.cs[j] = 1; A.ca[j] = 0; }
+    }
+    return;
+  }
+
+  if (shape === "han") {
+    // writing, then resting as characters
+    let wetAny = false;
+    ctx.fillStyle = colors.ink;
+    for (let j = 0; j < P; j++) {
+      if (A.dupH[j]) continue;
+      const age = T - A.rev[j];
+      if (age < 0) continue;
+      if (age < WET) { wetAny = true; continue; }
+      const x = A.hx[j], y = A.hy[j];
+      const sz = Math.round(base * proximity(x, y));
+      ctx.fillRect(Math.round(x * dpr - sz / 2), Math.round(y * dpr - sz / 2), sz, sz);
+    }
+    if (wetAny) {
+      for (let b = 0; b < NB - 1; b++) {
+        ctx.fillStyle = buckets[b];
+        for (let j = 0; j < P; j++) {
+          if (A.dupH[j]) continue;
+          const age = T - A.rev[j];
+          if (age < 0 || age >= WET) continue;
+          if (Math.min(NB - 2, Math.floor((age / WET) * (NB - 1))) !== b) continue;
+          const s = age < SCALE_IN ? backOut(age / SCALE_IN) : 1;
+          const sz = base * s;
+          ctx.fillRect(A.hx[j] * dpr - sz / 2, A.hy[j] * dpr - sz / 2, sz, sz);
+        }
+      }
+    }
+    return;
+  }
+
+  // resting as Latin, with the stamp's small shock
+  ctx.fillStyle = colors.ink;
+  let sh = null;
+  if (shock) {
+    const age = T - shock.t;
+    if (age > 700) shock = null;
+    else sh = { amp: G.c * 0.75 * Math.exp(-age / 120) * Math.sin(age / 36), x: shock.x, y: shock.y, R: G.S * 1.5 };
+  }
+  for (let j = 0; j < P; j++) {
+    if (A.dupL[j]) continue;
+    let x = A.lx[j], y = A.ly[j];
+    if (sh) {
+      const dx = x - sh.x, dy = y - sh.y, d = Math.hypot(dx, dy) || 1;
+      if (d < sh.R) { const f = sh.amp * Math.pow(1 - d / sh.R, 2); x += (dx / d) * f; y += (dy / d) * f; }
+    }
+    const sz = Math.round(base * proximity(x, y));
+    ctx.fillRect(Math.round(x * dpr - sz / 2), Math.round(y * dpr - sz / 2), sz, sz);
+  }
+}
+
+function sealPos(h) {
+  return { x: lerp(G.sealLat.x, G.sealHan.x, h), y: lerp(G.sealLat.y, G.sealHan.y, h) };
+}
+
+function drawSeal(h) {
+  if (T < T_STAMP || !sealCanvas) return;
+  const k = clamp((T - T_STAMP) / D_STAMP);
+  const { Z } = G;
+  const pos = sealPos(h);
+  let scale, rot, alpha, blur, off, shA;
+  const IMPACT = 0.42;
+  if (k < IMPACT) {
+    const q = k / IMPACT, qi = Math.pow(q, 2.2);
+    scale = 1.6 - 0.63 * qi; rot = -8 + 5.5 * qi; alpha = clamp(q * 2.4);
+    blur = 26 * (1 - q) + 2; off = 16 * (1 - q) + 1; shA = 0.28;
+  } else {
+    const q = EASE.settle((k - IMPACT) / (1 - IMPACT));
+    scale = 0.97 + 0.03 * q; rot = -2.5 + 0.5 * q; alpha = 1;
+    blur = 2; off = 1; shA = 0.28 * (1 - q);
+    if (!shock && !G.shocked) { shock = { t: T, x: pos.x + Z / 2, y: pos.y + Z / 2 }; G.shocked = true; }
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.translate(pos.x + Z / 2, pos.y + Z / 2);
+  ctx.rotate((rot * Math.PI) / 180);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = alpha;
+  if (shA > 0.01) {
+    ctx.shadowColor = `rgba(0,0,0,${shA})`;
+    ctx.shadowBlur = blur * dpr;
+    ctx.shadowOffsetY = off * dpr;
+  }
+  ctx.drawImage(sealCanvas, -Z / 2, -Z / 2, Z, Z);
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  ctx.globalAlpha = 1;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function currentH() {
+  if (!morph) return hTarget(shape);
+  const p = EASE.settle(clamp((T - morph.start) / (D_FLIGHT * (1 + SPREAD))));
+  return lerp(hFrom, hTarget(morph.to), p);
+}
+
+function placeHits(h) {
+  const idle = T >= T_IDLE;
+  nameHit.disabled = !idle; sealHit.disabled = !idle;
+  if (!idle) return;
+  const a = G.hanRect, b = G.latRect, pad = G.c * 3;
+  const x = Math.min(a.x, b.x) - pad, y = Math.min(a.y, b.y) - pad;
+  const w = Math.max(a.x + a.w, b.x + b.w) + pad - x, hh = Math.max(a.y + a.h, b.y + b.h) + pad - y;
+  Object.assign(nameHit.style, { left: x + "px", top: y + "px", width: w + "px", height: hh + "px" });
+  const sp = sealPos(h), Z = G.Z;
+  Object.assign(sealHit.style, { left: sp.x - 4 + "px", top: sp.y - 4 + "px", width: Z + 8 + "px", height: Z + 8 + "px" });
+  const tipW = Math.min(240, W - 32);
+  const tx = clamp(sp.x + Z / 2 - tipW / 2, 16, W - 16 - tipW);
+  Object.assign(sealTip.style, { left: tx + "px", top: sp.y + Z + 14 + "px", width: tipW + "px" });
+}
+
+/* ---------- loop ---------- */
+function frame(now) {
+  const dt = Math.min(64, now - (last || now));
+  last = now;
+  T += dt * speed;
+  pointer.s += ((pointer.active ? 1 : 0) - pointer.s) * Math.min(1, dt / 140);
+
+  if (!introMorphDone && T >= T_MORPH) { introMorphDone = true; startMorph("lat"); }
+
+  hNow = currentH();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const gridIntro = EASE.out(clamp(T / 800));
+  drawGrid(gridIntro * EASE.settle(hNow));
+  drawPinyin(clamp(hNow * 1.7 - 0.7));
+  drawParticles();
+  drawSeal(hNow);
+  placeHits(hNow);
+  requestAnimationFrame(frame);
+}
+
+function replay() {
+  T = reduceMQ.matches ? T_IDLE + 1 : 0;
+  introMorphDone = reduceMQ.matches;
+  morph = null; shock = null;
+  if (G) G.shocked = reduceMQ.matches;
+  shape = target = reduceMQ.matches ? "lat" : "han";
+  hNow = hTarget(shape);
+  if (A) restAt(shape);
+}
+
+function rebuild() {
+  computeLayout();
+  if (morph) { shape = morph.to; morph = null; }
+  target = shape;
+  G.shocked = T >= T_STAMP;
+  buildParticles();
+  sealCanvas = makeSeal(G.Z);
+}
+
+/* ---------- input ---------- */
+window.addEventListener("pointermove", e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = e.pointerType === "mouse"; });
+document.addEventListener("pointerleave", () => { pointer.active = false; });
+window.addEventListener("blur", () => { pointer.active = false; });
+nameHit.addEventListener("pointerdown", e => { lastPointerType = e.pointerType; });
+nameHit.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && T >= T_IDLE) startMorph("han"); });
+nameHit.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && T >= T_IDLE) startMorph("lat"); });
+nameHit.addEventListener("click", e => {
+  if (T < T_IDLE) return;
+  if (e.detail !== 0 && lastPointerType === "mouse") return;
+  startMorph(target === "han" ? "lat" : "han");
+});
+document.getElementById("replay").addEventListener("click", replay);
+const slowBtn = document.getElementById("slow");
+slowBtn.addEventListener("click", () => {
+  speed = speed === 1 ? 0.3 : 1;
+  slowBtn.setAttribute("aria-pressed", String(speed !== 1));
+});
+document.querySelectorAll(".seg .ctl").forEach(b => b.addEventListener("click", () => {
+  themeMode = b.dataset.mode;
+  try { localStorage.setItem("fu-proto-theme", themeMode); } catch (e) {}
+  applyTheme();
+}));
+let rT = 0;
+window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(rebuild, 120); });
+setInterval(() => { if (themeMode === "now") applyTheme(); }, 30000);
+
+/* ---------- boot ---------- */
+function boot() {
+  if (started) return;
+  started = true;
+  applyTheme();
+  computeLayout();
+  replay();
+  buildParticles();
+  sealCanvas = makeSeal(G.Z);
+  requestAnimationFrame(frame);
+}
+const fontReady = document.fonts && document.fonts.load
+  ? Promise.race([document.fonts.load(`600 100px "Instrument Sans"`), new Promise(r => setTimeout(r, 1500))])
+  : Promise.resolve();
+fontReady.then(boot, boot);
+})();
+</script>
+</body></html>
