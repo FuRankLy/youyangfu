@@ -2,6 +2,7 @@ import { TransitionLink } from "@/components/shell/PageWipe";
 import { STATUS_LABEL } from "@/content/projects";
 import type { Project } from "@/content/types";
 import { cn } from "@/lib/cn";
+import { StatusMark } from "./StatusMark";
 
 /** Column placement on the 12-column grid, shared by the header row and every project row. */
 export const WORK_COLUMNS = {
@@ -22,7 +23,6 @@ function Comma() {
  * On phones the cells stack: title, then year and role, then stack, then status.
  */
 export function WorkRow({ project }: { project: Project }) {
-  const current = project.status === "in-progress";
   return (
     <li className="border-b border-grid">
       <TransitionLink
@@ -57,7 +57,7 @@ export function WorkRow({ project }: { project: Project }) {
         <span className={cn("col-span-2", WORK_COLUMNS.stack)}>{project.stack.join(", ")}</span>
         <Comma />
         <span className={cn("col-span-2 text-ink-soft", WORK_COLUMNS.status)}>
-          {current && <span className="mr-2 inline-block h-2 w-2 bg-cinnabar" aria-hidden="true" />}
+          <StatusMark status={project.status} />
           {STATUS_LABEL[project.status]}
         </span>
       </TransitionLink>

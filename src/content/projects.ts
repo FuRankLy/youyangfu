@@ -13,6 +13,45 @@ import type { Project } from "./types";
  */
 export const projects: Project[] = [
   {
+    slug: "meddomain",
+    title: "MedDomain",
+    year: 2026,
+    role: "Co-founder and developer",
+    stack: ["Cloudflare", "Stripe"],
+    status: "seasonal",
+    summary:
+      "An AI practice app for the MMI, the admissions interview for medicine, made for first-year students at the University of Auckland.",
+    links: [{ label: "Website", href: "https://meddomain.org" }],
+    sections: [
+      {
+        heading: "Overview",
+        body: [
+          "MedDomain is an AI practice app for the Multiple Mini Interview (MMI), the admissions interview for medicine. It is made for first-year students at the University of Auckland.",
+          "I co-founded it and built it.",
+        ],
+      },
+      {
+        heading: "How it works",
+        body: [
+          "A student picks a station and answers out loud on camera, timed like the real interview or with no clock.",
+          "The answer is transcribed on their own device, then marked against real medical students' answers and the eight attributes the MMI is scored on, with written feedback on what to fix.",
+          "The question bank holds more than 400 real MMI questions across five station types: moral and ethical judgement, career motivation, personal insight and experience, New Zealand health issues, and Hauora Māori.",
+        ],
+      },
+      {
+        heading: "Seasonal",
+        body: [
+          "MedDomain runs once a year, in the lead-up to the interviews, and rests in between.",
+          "It is resting now, and opens again around September.",
+        ],
+      },
+      {
+        heading: "First season",
+        body: ["2026 was its first year. It earned more than NZ$3,000 in revenue and had close to 100 concurrent users."],
+      },
+    ],
+  },
+  {
     slug: "web3-uoa",
     title: "WEB3 UoA",
     year: 2026,
@@ -83,6 +122,7 @@ export const projectBySlug = (slug: string) => projects.find((p) => p.slug === s
 
 export const STATUS_LABEL: Record<Project["status"], string> = {
   live: "Live",
+  seasonal: "Seasonal",
   shipped: "Shipped",
   "in-progress": "In progress",
   archived: "Archived",

@@ -74,7 +74,8 @@ export type LifeEvent = {
   market?: string;
 };
 
-export type ProjectStatus = "live" | "shipped" | "in-progress" | "archived" | "deprecated";
+/** "seasonal" is for something that runs part of each year and is resting the rest of the time. */
+export type ProjectStatus = "live" | "seasonal" | "shipped" | "in-progress" | "archived" | "deprecated";
 
 export type ProjectSection = {
   heading: string;

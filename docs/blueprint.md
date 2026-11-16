@@ -117,7 +117,7 @@ Pinned scenes are phase 2. In phase 1 each chapter renders as a normal-height se
 - **Phase 2:** draw the candles on scroll, and zoom.
 
 ### 叁 Work
-- **See:** an index list: Project, Year, Role, Stack, Status. First row: "WEB3 UoA", 2026, Project manager and developer, React, Next.js and PostgreSQL, Live.
+- **See:** an index list: Project, Year, Role, Stack, Status. First row: "MedDomain", 2026, Co-founder and developer, Cloudflare and Stripe, Seasonal (a hollow cinnabar square; in progress gets a solid one).
 - **Moves:** hovered row lifts; a preview image follows the cursor, assembling from squares. Click opens `/work/[slug]` with the square wipe.
 - **Case study page:** title, facts row (year, role, stack, links), hero image, sections (The problem, What I built, Decisions, Outcome), next project link.
 
@@ -239,7 +239,7 @@ type Flag = { date: string; label: string };
 
 type Project = {
   slug: string; title: string; year: number; role: string; stack: string[];
-  status: "live" | "shipped" | "in-progress" | "archived";
+  status: "live" | "seasonal" | "shipped" | "in-progress" | "archived" | "deprecated";
   summary: string; links: { label: string; href: string }[]; cover?: string;
 };
 type Tool = { name: string; area: "Languages" | "Frontend" | "Backend" | "Data" | "Tools"; since: number; projects: string[] };

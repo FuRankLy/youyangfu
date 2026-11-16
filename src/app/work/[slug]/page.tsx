@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { HanText } from "@/components/chapters/work/HanText";
 import { ProjectCover } from "@/components/chapters/work/ProjectCover";
+import { StatusMark } from "@/components/chapters/work/StatusMark";
 import { TransitionLink } from "@/components/shell/PageWipe";
 import { DraftNote } from "@/components/ui/Chapter";
 import { STATUS_LABEL, nextProject, projectBySlug, projects, workCopy } from "@/content/projects";
@@ -93,9 +94,7 @@ export default async function CaseStudy({ params }: Props) {
           {project.stack.join(", ")}
         </Fact>
         <Fact label={columns.status} className="col-span-12 md:col-span-3 lg:col-span-2">
-          {project.status === "in-progress" && (
-            <span className="mr-2 inline-block h-2 w-2 translate-y-[-1px] bg-cinnabar" aria-hidden="true" />
-          )}
+          <StatusMark status={project.status} className="translate-y-[-1px]" />
           {STATUS_LABEL[project.status]}
         </Fact>
         {project.links.length > 0 && (
