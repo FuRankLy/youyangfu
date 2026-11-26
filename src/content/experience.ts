@@ -9,8 +9,8 @@ export const experience: ExperienceRole[] = [
     organisation: "Sandfield",
     role: "Software Developer Intern",
     dates: "Nov 2026 to Feb 2027",
-    summary: "Summer internship as a software developer.",
-    note: "Incoming",
+    summary:
+      "Building and automating tools for New Zealand-wide animal and organic product transportation, streamlining how transport companies create, assign and dispatch orders to move livestock and goods between locations and branches.",
   },
   {
     organisation: "Harmoney",

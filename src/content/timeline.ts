@@ -80,7 +80,7 @@ export const events: LifeEvent[] = [
     id: "sandfield",
     market: "Xero, the accounting software company founded in New Zealand, announced an A$1 billion share buyback on 12 November 2026.",
     title: "Software developer intern at Sandfield",
-    detail: "Summer internship.",
+    detail: "Summer internship, building and automating tools for New Zealand-wide animal and organic product transportation.",
     from: "2026-11",
     to: "2027-02",
     flag: "Sandfield",
