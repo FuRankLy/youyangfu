@@ -71,7 +71,13 @@ export function Header() {
     menuRef.current?.showModal();
     lock(true);
   };
-  const closeMenu = () => menuRef.current?.close();
+  // The dialog's close event fires a moment later, after a link in the menu has
+  // already asked to scroll, and a paused scroller ignores that. So scrolling
+  // resumes here, in step with the click; onClose covers the Escape key.
+  const closeMenu = () => {
+    menuRef.current?.close();
+    lock(false);
+  };
 
   return (
     <>

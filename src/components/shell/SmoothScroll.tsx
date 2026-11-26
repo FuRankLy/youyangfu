@@ -41,7 +41,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     if (!el) return;
     const lenis = lenisRef.current;
     if (lenis) {
-      lenis.scrollTo(el, { offset: -headerOffset(), immediate: options?.immediate, duration: 1.1 });
+      // Lenis already leaves the page's scroll-padding-top, which is the header's height plus a gap.
+      lenis.scrollTo(el, { immediate: options?.immediate, duration: 1.1 });
     } else {
       const top = el.getBoundingClientRect().top + window.scrollY - headerOffset();
       window.scrollTo({ top, behavior: options?.immediate ? "auto" : "smooth" });
